@@ -1,0 +1,30 @@
+{
+  "name": "@oasis-engine-tools/atlas-lottie",
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "homepage": "https://oasisengine.cn/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ant-galaxy/oasis-engine-tools"
+  },
+  "bugs": "https://github.com/ant-galaxy/oasis-engine-tools/issues",
+  "scripts": {
+    "b:types": "tsc",
+    "lint:fix": "tslint --fix --project ./tsconfig.json"
+  },
+  "types": "types/index.d.ts",
+  "main": "dist/umd/browser.js",
+  "module": "dist/es/index.js",
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "dependencies": {
+    "@oasis-engine-tools/atlas": "workspace:*",
+    "node-fetch": "^2.6.1"
+  }
+}
