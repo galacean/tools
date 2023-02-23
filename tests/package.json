@@ -1,0 +1,19 @@
+{
+  "name": "@oasis-engine-tools/tests",
+  "private": true,
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "module": "dist/es/index.js",
+  "types": "types/index.d.ts",
+  "debug": "src/index.ts",
+  "scripts": {
+    "b:types": "echo hi"
+  },
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "dependencies": {
+    "@oasis-engine-tools/baker": "workspace:*"
+  }
+}

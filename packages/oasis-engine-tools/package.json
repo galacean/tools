@@ -1,0 +1,28 @@
+{
+  "name": "oasis-engine-tools",
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "scripts": {
+    "b:types": "tsc"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "homepage": "https://oasisengine.cn/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ant-galaxy/oasis-engine-tools"
+  },
+  "bugs": "https://github.com/ant-galaxy/oasis-engine-tools/issues",
+  "types": "types/index.d.ts",
+  "module": "dist/es/index.js",
+  "main": "dist/umd/browser.js",
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "dependencies": {
+    "@oasis-engine-tools/baker": "workspace:*"
+  }
+}

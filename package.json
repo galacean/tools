@@ -1,0 +1,69 @@
+{
+  "name": "oasis-engine-tools-root",
+  "version": "1.0.0-alpha.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "homepage": "https://oasisengine.cn/",
+  "repository": "https://github.com/ant-galaxy/oasis-engine-tools",
+  "bugs": "https://github.com/ant-galaxy/oasis-engine-tools/issues",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "test": "cross-env TS_NODE_PROJECT=tsconfig.tests.json floss --path tests -r ts-node/register",
+    "test-debug": "cross-env TS_NODE_PROJECT=tsconfig.tests.json floss --path tests -r ts-node/register --debug",
+    "test-cov": "cross-env TS_NODE_PROJECT=tsconfig.tests.json nyc --reporter=lcov floss --path tests -r ts-node/register",
+    "ci": "pnpm install && npm run build && npm run b:types && npm run test-cov",
+    "lint": "eslint packages/*/src --ext .ts",
+    "watch": "rollup -cw -m inline",
+    "b:types": "pnpm -r --filter='./packages/*' run b:types",
+    "build": "rollup -c",
+    "b:all": "npm run b:types && cross-env BUILD_TYPE=ALL rollup -c",
+    "clean": "pnpm -r exec rm -rf dist && pnpm -r exec rm -rf types"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@swc/core": "^1.3.32",
+    "@swc/helpers": "^0.4.14",
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^8.2.3",
+    "@types/node": "^18.7.18",
+    "@types/offscreencanvas": "^2019.7.0",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "camelcase": "^7.0.1",
+    "chai": "^4.3.6",
+    "cross-env": "^5.2.1",
+    "electron": "^13.6.9",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-prettier": "^3.4.1",
+    "floss": "^5.0.1",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.4",
+    "nyc": "^15.1.0",
+    "oasis-engine": "beta",
+    "prettier": "^2.7.1",
+    "rollup": "^3",
+    "rollup-plugin-binary2base64": "1.0.3",
+    "rollup-plugin-glslify": "^1.3.1",
+    "rollup-plugin-swc3": "^0.8.0",
+    "ts-node": "^10",
+    "typescript": "^4.8.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{ts}": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}

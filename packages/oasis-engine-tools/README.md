@@ -4,10 +4,6 @@
 
 Some useful tools that can be used in [Oasis engine](https://github.com/oasis-engine/engine).
 
-## Tools
-
-- 🍞 &nbsp;**[Baker](packages/baker)** - Off-Screen Rendering, to generate Spherical harmonics and IBL mipmaps
-
 ## npm
 
 The tools is published on npm with full typing support. To install, use:
@@ -19,7 +15,7 @@ npm install oasis-engine-tools
 This will allow you to import tools entirely using:
 
 ```javascript
-import * as TOOLS from "oasis-engine-tools";
+import * as tools from "oasis-engine-tools";
 ```
 
 or individual classes using:
@@ -55,7 +51,7 @@ npm run b:all
 
 ## Links
 
-- [Official Site](https://oasisengine.cn)
+- [Repository](https://github.com/ant-galaxy/oasis-engine-tools)
 - [Examples](https://oasisengine.cn/#/examples/latest/ibl-baker)
 - [Documentation](https://oasisengine.cn/#/docs/latest/cn/install)
 - [API References](https://oasisengine.cn/#/api/latest/core)
