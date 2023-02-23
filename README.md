@@ -6,9 +6,10 @@ Some useful tools that can be used in [Oasis engine](https://github.com/oasis-en
 
 ## Tools
 
-- 🍞 &nbsp;**[Baker](packages/baker)** - Off-Screen Rendering, to generate Spherical harmonics and IBL mipmaps
-
-## npm
+- 🍞 &nbsp;**[baker](packages/baker)** - Off-Screen Rendering, to generate Spherical harmonics and IBL mipmaps
+- 🛠 &nbsp;**[atlas](packages/baker)** - Atlas tool for oasis engine
+- ⚒️ &nbsp;**[atlas-lottie](packages/baker)** - Transform lottie JSON file to atlas format in oasis engine. This tool will generate a folder which contains three files: a processed lottie JSON file, an atlas file and an image.
+- ⚾︎ &nbsp;**[color-dilation](packages/baker)** - Remove black borders from image.
 
 The tools is published on npm with full typing support. To install, use:
 
