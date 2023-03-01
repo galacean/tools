@@ -73,7 +73,7 @@ function makeRollupConfig(pkg) {
 
   const entries = Object.fromEntries(
     walk(path.join(pkg.location, "src"))
-      .filter((file) => /^(?!.*\.d\.ts$).*\.ts$/.test(file))
+      .filter((file) => /^(?!.*\.d\.ts$).*\.(ts|js)$/.test(file))
       .map((item) => {
         return [path.relative(path.join(pkg.location, "src"), item.replace(/\.[^/.]+$/, "")), item];
       })
@@ -86,31 +86,32 @@ function makeRollupConfig(pkg) {
     })
   );
 
-  return [
-    {
-      input: path.join(pkg.location, "src", "index.ts"),
-      output: {
-        file: path.join(pkg.location, "dist", "umd", "browser.js"),
-        format: "umd",
-        name: toGlobalName(pkg.pkgJson.name),
-        globals: globals
-      },
-      // 总包只 external oasis-engine
-      external: pkg.pkgJson.name === "oasis-engine-tools" ? ["oasis-engine"] : externals,
-      plugins: [...plugins, minify({ sourceMap: true })]
+  const es = {
+    input: entries,
+    output: {
+      dir: path.join(pkg.location, "dist", "es"),
+      format: "es",
+      sourcemap: true,
+      globals: globals
     },
-    {
-      input: entries,
-      output: {
-        dir: path.join(pkg.location, "dist", "es"),
-        format: "es",
-        sourcemap: true,
-        globals: globals
-      },
-      external: externals,
-      plugins
-    }
-  ];
+    external: externals,
+    plugins
+  };
+
+  const umd = {
+    input: path.join(pkg.location, "src", "index.ts"),
+    output: {
+      file: path.join(pkg.location, "dist", "umd", "browser.js"),
+      format: "umd",
+      name: toGlobalName(pkg.pkgJson.name),
+      globals: globals
+    },
+    // 总包只 external oasis-engine
+    external: pkg.pkgJson.name === "oasis-engine-tools" ? ["oasis-engine"] : externals,
+    plugins: [...plugins, minify({ sourceMap: true })]
+  };
+
+  return pkg.umd ? [umd, es] : [es];
 }
 
 export default Promise.all(pkgs.map(makeRollupConfig).flat());

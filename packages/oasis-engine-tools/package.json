@@ -23,6 +23,7 @@
     "types/**/*"
   ],
   "dependencies": {
-    "@oasis-engine-tools/baker": "workspace:*"
+    "@oasis-engine-tools/baker": "workspace:*",
+    "@oasis-engine-tools/color-dilation": "workspace:*"
   }
 }
