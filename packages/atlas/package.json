@@ -1,6 +1,6 @@
 {
   "name": "@oasis-engine-tools/atlas",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "MIT",
   "bin": {
     "oasis-tool-atlas": "./bin/cli.js"
