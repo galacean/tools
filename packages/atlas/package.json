@@ -2,6 +2,9 @@
   "name": "@oasis-engine-tools/atlas",
   "version": "1.0.0-alpha.0",
   "license": "MIT",
+  "bin": {
+    "oasis-tool-atlas": "./bin/cli.js"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"

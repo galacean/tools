@@ -2,6 +2,9 @@
   "name": "@oasis-engine-tools/atlas-lottie",
   "version": "1.0.0-alpha.0",
   "license": "MIT",
+  "bin": {
+    "oasis-atlas-lottie": "./bin/cli.js"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
