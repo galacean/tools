@@ -111,7 +111,7 @@ function makeRollupConfig(pkg) {
     plugins: [...plugins, minify({ sourceMap: true })]
   };
 
-  return pkg.umd ? [umd, es] : [es];
+  return pkg.pkgJson.main ? [umd, es] : [es];
 }
 
 export default Promise.all(pkgs.map(makeRollupConfig).flat());
