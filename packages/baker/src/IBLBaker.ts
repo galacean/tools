@@ -48,6 +48,7 @@ export class IBLBaker {
     const bakerCamera = bakerRoot.addComponent(Camera);
     bakerCamera.enableFrustumCulling = false;
     bakerCamera.fieldOfView = 90;
+    bakerCamera.aspectRatio = 1;
 
     const RTTScene = new TextureCube(engine, resolution, TextureFormat.R32G32B32A32); // baker platform must support float texture.
     const RTScene = new RenderTarget(engine, resolution, resolution, RTTScene);
