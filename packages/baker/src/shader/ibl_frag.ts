@@ -19,12 +19,32 @@ float pow2( const in float x ) {
     return x * x;
 }
 
+vec4 RGBEToLinear(vec4 value) {
+    return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
+}
+
+vec4 RGBMToLinear(vec4 value, float maxRange ) {
+    return vec4( value.rgb * value.a * maxRange, 1.0 );
+}
+
+
 vec4 gammaToLinear(vec4 srgbIn){
     return vec4( pow(srgbIn.rgb, vec3(2.2)), srgbIn.a);
 }
 
 vec4 toLinear(vec4 color){
-    return gammaToLinear(color);
+    vec4 linear;
+    #if (DECODE_MODE == 0)
+        linear = color;
+    #elif (DECODE_MODE == 1)
+        linear = gammaToLinear(color);
+    #elif (DECODE_MODE == 2)
+        linear = RGBEToLinear(color);
+    #elif (DECODE_MODE == 3)
+        linear = RGBMToLinear(color, 5.0);
+    #endif
+
+    return linear;
 }
 
 vec4 LinearToRGBM(vec4 value, float maxRange ) {
@@ -111,7 +131,9 @@ void main()
         dir = vec3(-cx,  cy, -1.);
     }
 
-    dir.x *= -1.0;
+    #ifdef FLIP_X
+        dir.x *= -1.0;
+    #endif
     dir = normalize(dir);
 
 
