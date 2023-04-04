@@ -114,7 +114,6 @@ export class IBLBaker {
     const originalFilterMode = texture.filterMode;
     const originalScene = engine.sceneManager.activeScene;
     const isPaused = engine.isPaused;
-    const bakerMipmapCount = texture.mipmapCount;
 
     engine.pause();
 
@@ -138,6 +137,8 @@ export class IBLBaker {
     bakerCamera.renderTarget = renderTarget;
 
     // render
+    const bakerMipmapCount = renderColorTexture.mipmapCount;
+
     bakerShaderData.setTexture("environmentMap", texture);
     bakerShaderData.setFloat("u_textureSize", resolution);
     bakerShaderData.enableMacro("DECODE_MODE", decodeMode + "");
