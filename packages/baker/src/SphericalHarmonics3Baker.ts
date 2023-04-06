@@ -1,4 +1,4 @@
-import { Color, SphericalHarmonics3, TextureCubeFace, TextureCube, Vector3 } from "oasis-engine";
+import { Color, SphericalHarmonics3, TextureCube, TextureCubeFace, Vector3 } from "oasis-engine";
 import { DecodeMode } from "./enums/DecodeMode";
 
 /**
@@ -14,8 +14,13 @@ export class SphericalHarmonics3Baker {
    * Bake from Cube texture.
    * @param texture - Cube texture
    * @param out - SH3 for output
+   * @param decodeMode - Mode of decoding texture cube, default DecodeMode.RGBM
    */
-  static fromTextureCubeMap(texture: TextureCube, decodeMode: DecodeMode, out: SphericalHarmonics3): void {
+  static fromTextureCubeMap(
+    texture: TextureCube,
+    out: SphericalHarmonics3,
+    decodeMode: DecodeMode = DecodeMode.RGBM
+  ): void {
     out.scale(0);
 
     const channelLength = 4;

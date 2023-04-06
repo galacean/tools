@@ -1,6 +1,6 @@
 # Baker
-Off-Screen Rendering, to generate Spherical harmonics and IBL mipmaps
 
+Off-Screen Rendering, to generate Spherical harmonics and IBL mipmaps
 
 # npm
 
@@ -25,22 +25,14 @@ import { IBLBaker } from "@oasis-engine-tools/baker";
 ## Usage
 
 ```ts
-const texture = await engine.resourceManager.load<TextureCube>({
-    url: "https://gw.alipayobjects.com/os/bmw-prod/10c5d68d-8580-4bd9-8795-6f1035782b94.bin", // sunset_1K
-    type: "HDR-RGBE"
-  })
-
-const bakedTexture = IBLBaker.fromTextureCubeMap(texture, DecodeMode.RGBE);
-ambientLight.specularTexture = bakedHDRCubeMap;
-ambientLight.specularTextureDecodeRGBM = true;
+const bakedTexture = IBLBaker.fromScene(scene);
+ambientLight.specularTexture = bakedTexture;
 
 const sh = new SphericalHarmonics3();
-SphericalHarmonics3Baker.fromTextureCubeMap(hdrCubeMap, DecodeMode.RGBE, sh);
+SphericalHarmonics3Baker.fromTextureCubeMap(bakedTexture, sh);
 ambientLight.diffuseMode = DiffuseMode.SphericalHarmonics;
 ambientLight.diffuseSphericalHarmonics = sh;
 ```
-
-
 
 ## Links
 

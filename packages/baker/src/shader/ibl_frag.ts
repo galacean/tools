@@ -27,10 +27,10 @@ vec4 RGBMToLinear(vec4 value, float maxRange ) {
     return vec4( value.rgb * value.a * maxRange, 1.0 );
 }
 
+
 vec4 gammaToLinear(vec4 srgbIn){
     return vec4( pow(srgbIn.rgb, vec3(2.2)), srgbIn.a);
 }
-
 
 vec4 toLinear(vec4 color){
     vec4 linear;
@@ -46,14 +46,6 @@ vec4 toLinear(vec4 color){
 
     return linear;
 }
-
-
-vec4 linearToRGBE(vec4 value ) {
-	float maxComponent = max( max( value.r, value.g ), value.b );
-	float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );
-	return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );
-}
-
 
 vec4 LinearToRGBM(vec4 value, float maxRange ) {
     float maxRGB = max( value.r, max( value.g, value.b ) );
@@ -138,7 +130,12 @@ void main()
     else if (face == 5.) { // NZ
         dir = vec3(-cx,  cy, -1.);
     }
+
+    #ifdef FLIP_X
+        dir.x *= -1.0;
+    #endif
     dir = normalize(dir);
+
 
     if (lodRoughness == 0.) {
         gl_FragColor = toLinear(textureCube(environmentMap, dir));
@@ -148,6 +145,5 @@ void main()
     }
     
     gl_FragColor = LinearToRGBM(gl_FragColor, 5.0);
-
 }
 `;
