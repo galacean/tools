@@ -5,7 +5,7 @@ import { ErrorCode } from "./enum/ErrorCode";
 import { OptDrawing } from "./opt/OptDrawing";
 import { OptLoadImage } from "./opt/OptLoadImage";
 import { OptPacking } from "./opt/OptPacking";
-import { MaxRectsMethod } from "@galacean/tool-atlas-algorithm";
+import { MaxRectsMethod } from "@galacean/tools-atlas-algorithm";
 
 const packingPipe = [new OptLoadImage(), new OptPacking(), new OptDrawing()];
 const DefaultOption = {

@@ -1,4 +1,4 @@
-import { Rect } from "@galacean/tool-atlas-algorithm";
+import { Rect } from "@galacean/tools-atlas-algorithm";
 import { PackingOption } from "../interface/PackingOption";
 import { PackingItem } from "./PackingItem";
 import { PackingOutput } from "./PackingOutput";

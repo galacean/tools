@@ -1,4 +1,4 @@
-import { MaxRectsMethod } from "@galacean/tool-atlas-algorithm";
+import { MaxRectsMethod } from "@galacean/tools-atlas-algorithm";
 
 export interface PackingOption {
   width?: number;
