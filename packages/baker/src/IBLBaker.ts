@@ -9,12 +9,12 @@ import {
   TextureCube,
   TextureCubeFace,
   TextureFilterMode
-} from "oasis-engine";
+} from "@galacean/engine";
 import { DecodeMode } from "./enums/DecodeMode";
 import frag from "./shader/ibl_frag";
 import vertex from "./shader/vertex";
 
-const SHADER_NAME = "Oasis-IBL-baker";
+const SHADER_NAME = "Galacean-IBL-baker";
 Shader.create(SHADER_NAME, vertex, frag);
 
 /**

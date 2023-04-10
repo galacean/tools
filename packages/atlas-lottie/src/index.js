@@ -1,4 +1,4 @@
-const atlasTool = require("@oasis-engine/tool-atlas");
+const atlasTool = require("@galacean/tools-atlas");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");

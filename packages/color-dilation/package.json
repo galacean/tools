@@ -1,5 +1,5 @@
 {
-  "name": "@oasis-engine-tools/color-dilation",
+  "name": "@galacean/tools-color-dilation",
   "version": "1.0.0",
   "license": "MIT",
   "publishConfig": {
@@ -9,9 +9,9 @@
   "homepage": "https://oasisengine.cn/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ant-galaxy/oasis-engine-tools"
+    "url": "https://github.com/galacean/tools"
   },
-  "bugs": "https://github.com/ant-galaxy/oasis-engine-tools/issues",
+  "bugs": "https://github.com/galacean/tools/issues",
   "scripts": {
     "b:types": "tsc",
     "lint:fix": "tslint --fix --project ./tsconfig.json"

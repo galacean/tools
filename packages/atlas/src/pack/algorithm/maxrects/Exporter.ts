@@ -22,14 +22,14 @@ export class Exporter {
 
   async export(version: string, output: string, packer: MaxRectsPacker) {
     switch (this.format) {
-      case AtlasFormat.Oasis:
-        return this._exportToOasis(version, output, packer);
+      case AtlasFormat.Galacean:
+        return this._exportToGalacean(version, output, packer);
       default:
-        return this._exportToOasis(version, output, packer);
+        return this._exportToGalacean(version, output, packer);
     }
   }
 
-  private async _exportToOasis(version: string, output: string, packer: MaxRectsPacker) {
+  private async _exportToGalacean(version: string, output: string, packer: MaxRectsPacker) {
     const res = { atlasItems: <any>[], version: version, format: 1};
     const imageFile = await this._generatePackedImage(output, packer);
     const item = {

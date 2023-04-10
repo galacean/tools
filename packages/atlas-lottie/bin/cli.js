@@ -13,7 +13,7 @@ program.version(packageJson.version);
 program
   .option("-s, --src <src>", "the lottie JSON file")
   .option("-i, --images <images>", "the image files")
-  .description("Transform lottie file to oasis atlas format")
+  .description("Transform lottie file to galacean atlas format")
   .action((argv) => {
     transform(argv.src, argv.images);
   });

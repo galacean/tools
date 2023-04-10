@@ -1,9 +1,9 @@
 {
-  "name": "@oasis-engine-tools/atlas",
-  "version": "1.0.0",
+  "name": "@galacean/tools-atlas",
+  "version": "0.9.0-beta.0",
   "license": "MIT",
   "bin": {
-    "oasis-tool-atlas": "./bin/cli.js"
+    "galacean-tool-atlas": "./bin/cli.js"
   },
   "publishConfig": {
     "access": "public",
@@ -12,9 +12,9 @@
   "homepage": "https://oasisengine.cn/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ant-galaxy/oasis-engine-tools"
+    "url": "https://github.com/galacean/tools"
   },
-  "bugs": "https://github.com/ant-galaxy/oasis-engine-tools/issues",
+  "bugs": "https://github.com/galacean/tools/issues",
   "scripts": {
     "b:types": "tsc",
     "lint:fix": "tslint --fix --project ./tsconfig.json"

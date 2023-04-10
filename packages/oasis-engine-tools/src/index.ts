@@ -1,7 +1,7 @@
-export * from "@oasis-engine-tools/baker";
-export * from "@oasis-engine-tools/color-dilation";
+export * from "@galacean/tools-baker";
+export * from "@galacean/tools-color-dilation";
 
 //@ts-ignore
 export const version = `__buildVersion`;
 
-console.log(`oasis engine tools version: ${version}`);
+console.log(`galacean engine tools version: ${version}`);

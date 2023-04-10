@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 import { walkDir } from "./FileHandler";
-import { texturePacker2Oasis } from "./TransHandler";
+import { texturePacker2Galacean } from "./TransHandler";
 export function formatConversion(filePath: string, cmdObj: any) {
   // 统一一下路径的斜杆
   filePath = filePath.replace(/\\/g, "/");
@@ -16,11 +16,11 @@ export function formatConversion(filePath: string, cmdObj: any) {
     filePath,
     (singlePath: string, fileData: Buffer) => {
       try {
-        const resAtlas = texturePacker2Oasis([JSON.parse(fileData.toString())]);
+        const resAtlas = texturePacker2Galacean([JSON.parse(fileData.toString())]);
         if (resAtlas) {
           const outPath = cmdObj.output
             ? cmdObj.output
-            : path.basename(singlePath).split(".")[0] + "-oasis";
+            : path.basename(singlePath).split(".")[0] + "-galacean";
           fs.writeFileSync(
             path.join(path.dirname(singlePath), outPath + ".atlas"),
             JSON.stringify(resAtlas)

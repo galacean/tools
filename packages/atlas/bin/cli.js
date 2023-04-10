@@ -8,13 +8,13 @@ const core = require("../dist/es");
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "../package.json")));
 program.version(packageJson.version);
 
-// Convert other atlas formats to oasis atlas.
+// Convert other atlas formats to galacean atlas.
 program
   .command("formatConversion <filePath>")
-  .description("convert other atlas formats to oasis atlas")
+  .description("convert other atlas formats to galacean atlas")
   .alias("fc")
   .option("-t, --type []", "atlas format", "texture-packer")
-  .option("-o, --output [atlas fileName]", "the name of output", "oasis-atlas")
+  .option("-o, --output [atlas fileName]", "the name of output", "galacean-atlas")
   .action((filePath, cmdObj) => {
     core.formatConversion(filePath, cmdObj);
   });
@@ -24,8 +24,8 @@ program
   .command("pack <imageDir|imageName> [other...]")
   .description("pack images to atlas")
   .alias("p")
-  .option("-f, --format []", "the format for atlas", "oasis")
-  .option("-o, --output <fileName>", "output atlas filename", "oasis")
+  .option("-f, --format []", "the format for atlas", "galacean")
+  .option("-o, --output <fileName>", "output atlas filename", "galacean")
   .option("-a, --algorithm []", "the algorithm for pack", "maxrects")
   .option("-ar, --allowRotate []", "mark whether image allow rotate when pack", false)
   .option("-p, --padding []", "between images", 1)

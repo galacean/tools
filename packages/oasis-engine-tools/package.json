@@ -1,6 +1,6 @@
 {
-  "name": "oasis-engine-tools",
-  "version": "1.0.0",
+  "name": "@galacean/tools",
+  "version": "0.9.0-beta.0",
   "license": "MIT",
   "scripts": {
     "b:types": "tsc"
@@ -10,11 +10,11 @@
     "registry": "https://registry.npmjs.org"
   },
   "homepage": "https://oasisengine.cn/",
-  "repository": {
+    "repository": {
     "type": "git",
-    "url": "https://github.com/ant-galaxy/oasis-engine-tools"
+    "url": "https://github.com/galacean/tools"
   },
-  "bugs": "https://github.com/ant-galaxy/oasis-engine-tools/issues",
+  "bugs": "https://github.com/galacean/tools/issues",
   "types": "types/index.d.ts",
   "module": "dist/es/index.js",
   "main": "dist/umd/browser.js",
@@ -23,7 +23,7 @@
     "types/**/*"
   ],
   "dependencies": {
-    "@oasis-engine-tools/baker": "workspace:*",
-    "@oasis-engine-tools/color-dilation": "workspace:*"
+    "@galacean/tools-baker": "workspace:*",
+    "@galacean/tools-color-dilation": "workspace:*"
   }
 }

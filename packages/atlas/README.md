@@ -1,13 +1,13 @@
 # tool-atlas
 
-Atlas tool for oasis engine
+Atlas tool for galacean engine
 
 # Usage in terminal
 
 ## 1、Install
 
 ```
-npm i @oasis-engine-tools/atlas -g
+npm i @galacean/tools-atlas -g
 ```
 
 ## 2、Use command in terminal
@@ -18,18 +18,18 @@ Pack images to atlas
 
 ```
 // Pack images to atlas.
-oasis-tool-atlas p ./atlas-test/111 -f oasis -o outputName -p 2
+galacean-tool-atlas p ./atlas-test/111 -f galacean -o outputName -p 2
 
 // Option help.
-oasis-tool-atlas p -h
+galacean-tool-atlas p -h
 ```
 
 Options detail
 
 | option         | instruction                                                |
 | -------------- | ---------------------------------------------------------- |
-| f/format       | the format for atlas (default: "oasis")                    |
-| o/output       | output atlas filename (default: "oasis")                   |
+| f/format       | the format for atlas (default: "galacean")                    |
+| o/output       | output atlas filename (default: "galacean")                   |
 | a/algorithm    | the algorithm for pack (default: "maxrects")               |
 | ar/allowRotate | mark whether image allow rotate when pack (default: false) |
 | p/padding      | between images (default: 1)                                |
@@ -40,14 +40,14 @@ Options detail
 
 ### 2.2、formatConversion or fc
 
-Convert other atlas formats to oasis atlas
+Convert other atlas formats to galacean atlas
 
 ```
-// Convert other atlas formats to oasis atlas.
-oasis-tool-atlas fc -t texture-packer -o oasis-atlas
+// Convert other atlas formats to galacean atlas.
+galacean-tool-atlas fc -t texture-packer -o galacean-atlas
 
 // Option help.
-oasis-tool-atlas fc -h
+galacean-tool-atlas fc -h
 ```
 
 Options detail
@@ -55,20 +55,20 @@ Options detail
 | option   | instruction                                 |
 | -------- | ------------------------------------------- |
 | t/type   | atlas format (default: "texture-packer")    |
-| o/output | the name of output (default: "oasis-atlas") |
+| o/output | the name of output (default: "galacean-atlas") |
 
 # Usage in node project
 
 ## 1、Install
 
 ```
-npm i @oasis-engine-tools/atlas --save
+npm i @galacean/tools-atlas --save
 ```
 
 ## 2、Call api
 
 ```
-const core = require("@oasis-engine-tools/atlas");
+const core = require("@galacean/tools-atlas");
 
 // Pack images to atlas.
 const imageFiles = [ // the images to pack
@@ -77,8 +77,8 @@ const imageFiles = [ // the images to pack
   "https://test/test.png"
 ];
 core.pack(imageFiles, {
-  format: 'oasis', // the format for atlas (default: "oasis")
-  output: 'oasis', // output atlas filename (default: "oasis")
+  format: 'galacean', // the format for atlas (default: "galacean")
+  output: 'galacean', // output atlas filename (default: "galacean")
   algorithm: 'maxrects', // the algorithm for pack (default: "maxrects")
   allowRotate: false, // mark whether image allow rotate when pack (default: false)
   padding: 1, // between images (default: 1)
@@ -99,10 +99,10 @@ core.pack(imageFiles, {
   */
 });
 
-// Convert other atlas formats to oasis atlas.
+// Convert other atlas formats to galacean atlas.
 const filePath = "./test.json"; // the file exported by texture packer
 core.formatConversion(filePath, {
   "type": texture-packer, // atlas format
-  "output": oasis-atlas // the name of output
+  "output": galacean-atlas // the name of output
 });
 ```
