@@ -1,7 +1,7 @@
 import { TextureFormat } from "./TextureFormat";
 
-// 多个 texturepacker 文件可以打包成一个 OasisAtlas 文件
-export function texturePacker2Oasis(fileObjArr: any[]) {
+// 多个 texturepacker 文件可以打包成一个 GalaceanAtlas 文件
+export function texturePacker2Galacean(fileObjArr: any[]) {
   const res = { atlasItems: <any>[], version: "1.0", format: 0 };
   for (let i = 0; i < fileObjArr.length; i++) {
     const fileObj = fileObjArr[i];

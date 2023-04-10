@@ -1,0 +1,20 @@
+{
+  "name": "@galacean/tools-atlas-algorithm",
+  "version": "0.9.0-beta.0",
+  "description": "图集打包工具的算法",
+  "scripts": {
+    "b:types": "tsc",
+    "lint:fix": "tslint --fix --project ./tsconfig.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "types/index.d.ts",
+  "main": "dist/index.js",
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ]
+}

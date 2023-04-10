@@ -7,19 +7,19 @@ Off-Screen Rendering, to generate Spherical harmonics and IBL mipmaps
 The `Baker` is published on npm with full typing support. To install, use:
 
 ```sh
-$ npm install @oasis-engine-tools/baker
+$ npm install @galacean/tools-baker
 ```
 
 This will allow you to import package entirely using:
 
 ```javascript
-import * as BAKER from "@oasis-engine-tools/baker";
+import * as BAKER from "@galacean/tools-baker";
 ```
 
 or individual classes using:
 
 ```javascript
-import { IBLBaker } from "@oasis-engine-tools/baker";
+import { IBLBaker } from "@galacean/tools-baker";
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ ambientLight.diffuseSphericalHarmonics = sh;
 
 ## Links
 
-- [Repository](https://github.com/ant-galaxy/oasis-engine-tools)
+- [Repository](https://github.com/ant-galaxy/@galacean/tools)
 - [Examples](https://oasisengine.cn/#/examples/latest/ibl-baker)
 - [Documentation](https://oasisengine.cn/#/docs/latest/cn/install)
 - [API References](https://oasisengine.cn/#/api/latest/core)

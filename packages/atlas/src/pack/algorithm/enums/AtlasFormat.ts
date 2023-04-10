@@ -1,3 +1,3 @@
 export enum AtlasFormat {
-  Oasis
+  Galacean
 }

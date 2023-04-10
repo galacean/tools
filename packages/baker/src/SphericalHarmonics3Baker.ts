@@ -1,4 +1,4 @@
-import { Color, SphericalHarmonics3, TextureCube, TextureCubeFace, Vector3 } from "oasis-engine";
+import { Color, SphericalHarmonics3, TextureCube, TextureCubeFace, Vector3 } from "@galacean/engine";
 import { DecodeMode } from "./enums/DecodeMode";
 
 /**

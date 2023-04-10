@@ -25,8 +25,8 @@ export async function pack(imageFiles: Array<string>, cliOptions: any) {
         allowRotate: cliOptions.allowRotate || false,
         square: cliOptions.square || false,
         pot: cliOptions.pot || false,
-        format: getAtlasFormat(cliOptions.format || 'oasis'),
-        output: cliOptions.output || 'oasis',
+        format: getAtlasFormat(cliOptions.format || 'galacean'),
+        output: cliOptions.output || 'galacean',
         editorExtras: cliOptions.editorExtras || []
       });
     case AlgorithmType.Polygon:
@@ -47,10 +47,10 @@ function getAlgorithmType(algorithm: string): AlgorithmType {
 
 function getAtlasFormat(format: string): AtlasFormat {
   switch (format) {
-    case "oasis":
-      return AtlasFormat.Oasis;
+    case "galacean":
+      return AtlasFormat.Galacean;
     default:
-      return AtlasFormat.Oasis;
+      return AtlasFormat.Galacean;
   }
 }
 

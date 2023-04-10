@@ -12,13 +12,13 @@ import {
   TextureFilterMode,
   TextureFormat,
   Vector3
-} from "oasis-engine";
+} from "@galacean/engine";
 import { BakerResolution } from "./enums/BakerResolution";
 import { DecodeMode } from "./enums/DecodeMode";
 import frag from "./shader/ibl_frag";
 import vertex from "./shader/vertex";
 
-const SHADER_NAME = "Oasis-IBL-baker";
+const SHADER_NAME = "Galacean-IBL-baker";
 Shader.create(SHADER_NAME, vertex, frag);
 
 /**

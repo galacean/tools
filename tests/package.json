@@ -1,7 +1,7 @@
 {
-  "name": "@oasis-engine-tools/tests",
+  "name": "@galacean/tools-tests",
   "private": true,
-  "version": "1.0.0-alpha.0",
+  "version": "0.9.0-beta.0",
   "license": "MIT",
   "module": "dist/es/index.js",
   "types": "types/index.d.ts",
@@ -14,6 +14,6 @@
     "types/**/*"
   ],
   "dependencies": {
-    "@oasis-engine-tools/baker": "workspace:*"
+    "@galacean/tools-baker": "workspace:*"
   }
 }

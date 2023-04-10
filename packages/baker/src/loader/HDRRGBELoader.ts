@@ -9,7 +9,7 @@ import {
   TextureCube,
   TextureCubeFace,
   Vector3
-} from "oasis-engine";
+} from "@galacean/engine";
 
 const PI = Math.PI;
 

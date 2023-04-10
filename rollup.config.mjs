@@ -65,7 +65,7 @@ function makeRollupConfig(pkg) {
     Object.assign({}, pkg.pkgJson.dependencies, pkg.pkgJson.peerDependencies, pkg.pkgJson.devDependencies)
   );
   const globals = {
-    "oasis-engine": "oasisEngine"
+    "@galacean/engine": "@galaceanEngine"
   };
   externals.forEach((external) => {
     globals[external] = toGlobalName(external);
@@ -106,8 +106,8 @@ function makeRollupConfig(pkg) {
       name: toGlobalName(pkg.pkgJson.name),
       globals: globals
     },
-    // 总包只 external oasis-engine
-    external: pkg.pkgJson.name === "oasis-engine-tools" ? ["oasis-engine"] : externals,
+    // 总包只 external @galacean/engine
+    external: pkg.pkgJson.name === "@galacean/tools" ? ["@galacean/engine"] : externals,
     plugins: [...plugins, minify({ sourceMap: true })]
   };
 

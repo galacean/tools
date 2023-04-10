@@ -1,4 +1,4 @@
-import { SphericalHarmonics3, TextureCubeFace, TextureCube } from "oasis-engine";
+import { SphericalHarmonics3, TextureCubeFace, TextureCube } from "@galacean/engine";
 
 export function toBuffer(bakedTexture: TextureCube, sh: SphericalHarmonics3): ArrayBuffer {
   const size = bakedTexture.width;
