@@ -12,8 +12,8 @@
     "registry": "https://registry.npmjs.org"
   },
   "types": "types/index.d.ts",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/umd/browser.js",
+  "module": "dist/es/index.js",
   "author": "",
   "files": [
     "dist/**/*",
