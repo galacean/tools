@@ -1,7 +1,7 @@
 {
-  "name": "@galacean/tools-atlas-browser",
-  "version": "1.0.0-alpha.1",
-  "description": "图集打包工具的浏览器版本",
+  "name": "@galacean/tools-atlas-lottie-browser",
+  "version": "0.9.0-beta.2",
+  "description": "Lottie 图集打包工具的浏览器版本",
   "scripts": {
     "b:types": "tsc",
     "lint:fix": "tslint --fix --project ./tsconfig.json"
@@ -20,6 +20,6 @@
     "types/**/*"
   ],
   "dependencies": {
-    "@galacean/tools-atlas-algorithm": "workspace:*"
+    "@galacean/tools-atlas-browser": "workspace:*"
   }
 }

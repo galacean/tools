@@ -10,7 +10,8 @@
     "access": "public"
   },
   "types": "types/index.d.ts",
-  "main": "dist/index.js",
+  "main": "dist/umd/browser.js",
+  "module": "dist/es/index.js",
   "author": "",
   "license": "ISC",
   "files": [
