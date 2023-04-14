@@ -1,6 +1,6 @@
 {
   "name": "@galacean/tools-atlas-lottie",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "license": "MIT",
   "bin": {
     "galacean-atlas-lottie": "./bin/cli.js"
