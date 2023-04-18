@@ -64,12 +64,12 @@ function makeRollupConfig(pkg) {
   const externals = Object.keys(
     Object.assign({}, pkg.pkgJson.dependencies, pkg.pkgJson.peerDependencies, pkg.pkgJson.devDependencies)
   );
-  const globals = {
-    "@galacean/engine": "@galacean/engine"
-  };
+  const globals = {};
   externals.forEach((external) => {
     globals[external] = toGlobalName(external);
   });
+
+  globals["@galacean/engine"] = "Galacean";
 
   const entries = Object.fromEntries(
     walk(path.join(pkg.location, "src"))
