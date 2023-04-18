@@ -1,6 +1,6 @@
 {
   "name": "@galacean/tools-atlas-browser",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "图集打包工具的浏览器版本",
   "scripts": {
     "b:types": "tsc",
