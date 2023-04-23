@@ -374,7 +374,7 @@ class HDRRGBELoader extends Loader<TextureCube> {
   load(item: LoadItem, resourceManager: ResourceManager): AssetPromise<TextureCube> {
     return new AssetPromise((resolve, reject) => {
       const engine = resourceManager.engine;
-
+      
       resourceManager
         .load<ArrayBuffer>({
           url: item.url,
@@ -384,7 +384,7 @@ class HDRRGBELoader extends Loader<TextureCube> {
           const uint8Array = new Uint8Array(buffer);
           const { width, height, dataPosition } = HDRRGBELoader._parseHeader(uint8Array);
           const pixels = HDRRGBELoader._readPixels(uint8Array.subarray(dataPosition), width, height);
-          const cubeSize = height >> 1;
+          const cubeSize = item?.params?.size || height >> 1;
 
           const cubeMapData = HDRRGBELoader._convertToCubemap(pixels, width, height, cubeSize);
           const texture = new TextureCube(engine, cubeSize);
