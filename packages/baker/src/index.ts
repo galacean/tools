@@ -1,4 +1,3 @@
-import "./loader/HDRRGBELoader";
 export { BakerResolution } from "./enums/BakerResolution";
 export { DecodeMode } from "./enums/DecodeMode";
 export { IBLBaker } from "./IBLBaker";
