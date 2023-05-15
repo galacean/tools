@@ -3,7 +3,7 @@
 const program = require("commander");
 const fs = require("fs");
 const path = require("path");
-const core = require("../dist/es");
+const core = require("../dist/main");
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "../package.json")));
 program.version(packageJson.version);

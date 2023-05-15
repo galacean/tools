@@ -20,7 +20,7 @@
     "lint:fix": "tslint --fix --project ./tsconfig.json"
   },
   "types": "types/index.d.ts",
-  "module": "dist/es/index.js",
+  "main": "dist/main.js",
   "files": [
     "dist/**/*",
     "types/**/*"

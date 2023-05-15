@@ -30,16 +30,15 @@ const pkgs = fs
     };
   });
 
-// "oasisEngine" 、 "@oasisEngine/controls" ...
+// "@galacean/toolsBaker" ...
 function toGlobalName(pkgName) {
   return camelCase(pkgName);
 }
 
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
-const mainFields = ["module", "main"];
 
 const plugins = [
-  resolve({ extensions, preferBuiltins: true, mainFields }),
+  resolve({ extensions, preferBuiltins: true }),
   glslify({
     include: [/\.glsl$/]
   }),
@@ -64,12 +63,6 @@ function makeRollupConfig(pkg) {
   const externals = Object.keys(
     Object.assign({}, pkg.pkgJson.dependencies, pkg.pkgJson.peerDependencies, pkg.pkgJson.devDependencies)
   );
-  const globals = {};
-  externals.forEach((external) => {
-    globals[external] = toGlobalName(external);
-  });
-
-  globals["@galacean/engine"] = "Galacean";
 
   const entries = Object.fromEntries(
     walk(path.join(pkg.location, "src"))
@@ -86,32 +79,55 @@ function makeRollupConfig(pkg) {
     })
   );
 
-  const es = {
-    input: entries,
-    output: {
-      dir: path.join(pkg.location, "dist", "es"),
-      format: "es",
-      sourcemap: true,
-      globals: globals
-    },
-    external: externals,
-    plugins
-  };
+  const globals = {};
+  externals.forEach((external) => {
+    globals[external] = toGlobalName(external);
+  });
 
-  const umd = {
-    input: path.join(pkg.location, "src", "index.ts"),
-    output: {
-      file: path.join(pkg.location, "dist", "umd", "browser.js"),
-      format: "umd",
-      name: toGlobalName(pkg.pkgJson.name),
-      globals: globals
-    },
-    // 总包只 external @galacean/engine
-    external: pkg.pkgJson.name === "@galacean/tools" ? ["@galacean/engine"] : externals,
-    plugins: [...plugins, minify({ sourceMap: true })]
-  };
+  globals["@galacean/engine"] = "Galacean";
 
-  return pkg.pkgJson.main ? [umd, es] : [es];
+  const config = [];
+  const input = path.join(pkg.location, "src", pkg.pkgJson.types ? "index.ts" : "index.js");
+  if (pkg.pkgJson.main) {
+    config.push({
+      input,
+      output: {
+        file: path.join(pkg.location, pkg.pkgJson.main),
+        format: "commonjs",
+        sourcemap: true
+      },
+      external: externals,
+      plugins
+    });
+  }
+  if (pkg.pkgJson.module) {
+    config.push({
+      input,
+      output: {
+        file: path.join(pkg.location, pkg.pkgJson.module),
+        format: "es",
+        sourcemap: true
+      },
+      external: externals,
+      plugins
+    });
+  }
+  if (pkg.pkgJson.browser) {
+    config.push({
+      input,
+      output: {
+        file: path.join(pkg.location, pkg.pkgJson.browser),
+        format: "umd",
+        name: toGlobalName(pkg.pkgJson.name),
+        globals: globals
+      },
+      // 总包只 external @galacean/engine
+      external: pkg.pkgJson.name === "@galacean/tools" ? ["@galacean/engine"] : externals,
+      plugins: [...plugins, minify({ sourceMap: true })]
+    });
+  }
+
+  return config;
 }
 
 export default Promise.all(pkgs.map(makeRollupConfig).flat());
