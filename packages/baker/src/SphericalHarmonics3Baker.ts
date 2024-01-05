@@ -1,6 +1,6 @@
-import { Color, SphericalHarmonics3, TextureCube, TextureCubeFace, Vector3 } from "@galacean/engine";
-import { DecodeMode } from "./enums/DecodeMode";
+import { Color, SphericalHarmonics3, TextureCube, TextureCubeFace } from "@galacean/engine";
 import { WorkerManager } from "./WorkerManager";
+import { DecodeMode } from "./enums/DecodeMode";
 
 /**
  * Bake irradiance into spherical harmonics3 and use WebWorker.
