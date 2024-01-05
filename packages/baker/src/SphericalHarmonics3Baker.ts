@@ -8,9 +8,6 @@ import { WorkerManager } from "./WorkerManager";
  * http://www.ppsloan.org/publications/StupidSH36.pdf
  */
 export class SphericalHarmonics3Baker {
-  private static _tempColor: Color = new Color();
-  private static _tempVector: Vector3 = new Vector3();
-
   /**
    * Bake from Cube texture and use WebWorker.
    * @param texture - Cube texture
@@ -73,7 +70,7 @@ export function RGBMToLinear(r: number, g: number, b: number, a: number, color: 
   color[3] = 1;
 }
 export const gammaToLinearSpace = Color.gammaToLinearSpace;
-export function addSH(direction: number[], color: number[], deltaSolidAngle: number, sh: number[]): void {
+export function addSH(direction: number[], color: number[], deltaSolidAngle: number, sh: Float32Array): void {
   const x = direction[0];
   const y = direction[1];
   const z = direction[2];
