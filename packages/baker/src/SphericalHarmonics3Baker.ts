@@ -69,7 +69,7 @@ export function RGBMToLinear(r: number, g: number, b: number, a: number, color: 
   color[2] = b * scale;
   color[3] = 1;
 }
-export const gammaToLinearSpace = function gammaToLinearSpace(value: number): number {
+export function gammaToLinearSpace(value: number): number {
   // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_framebuffer_sRGB.txt
   // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_sRGB_decode.txt
 
@@ -77,7 +77,7 @@ export const gammaToLinearSpace = function gammaToLinearSpace(value: number): nu
   else if (value <= 0.04045) return value / 12.92;
   else if (value < 1.0) return Math.pow((value + 0.055) / 1.055, 2.4);
   else return Math.pow(value, 2.4);
-};
+}
 export function addSH(direction: number[], color: number[], deltaSolidAngle: number, sh: Float32Array): void {
   const x = direction[0];
   const y = direction[1];
