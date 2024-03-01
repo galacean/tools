@@ -1,6 +1,6 @@
 {
   "name": "@galacean/tools-atlas",
-  "version": "1.2.0-alpha.2",
+  "version": "1.2.0-alpha.3",
   "license": "MIT",
   "bin": {
     "galacean-tool-atlas": "./bin/cli.js"
