@@ -1,6 +1,6 @@
 {
   "name": "@galacean/tools-atlas-algorithm",
-  "version": "1.2.0-alpha.3",
+  "version": "1.2.0-beta.0",
   "description": "图集打包工具的算法",
   "scripts": {
     "b:types": "tsc",
