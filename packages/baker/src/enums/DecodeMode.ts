@@ -1,6 +1,6 @@
 export enum DecodeMode {
   Linear,
-  Gamma,
+  SRGB,
   RGBE,
   RGBM
 }
