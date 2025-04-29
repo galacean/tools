@@ -3,6 +3,11 @@ import importanceSampling from "./importanceSampling";
 
 export default `
 #include <common>
+
+vec4 RGBEToLinear(vec4 value) {
+    return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
+}
+    
 varying vec2 v_uv;
 
 uniform samplerCube environmentMap;
