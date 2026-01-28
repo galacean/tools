@@ -1,108 +1,118 @@
-import { PackingContext } from "../interface/PackingContext";
-import { PackingItem } from "../interface/PackingItem";
 import { ErrorCode } from "../enum/ErrorCode";
+import { PackingContext } from "../interface/PackingContext";
+import { AtlasConfig, AtlasSprite } from "../interface/PackingOutput";
 import { OptHandler } from "./OptHandler";
 
 export class OptDrawing extends OptHandler {
   private canvas: OffscreenCanvas | HTMLCanvasElement;
-  private context2D:
-    | CanvasRenderingContext2D
-    | OffscreenCanvasRenderingContext2D;
+  private context2D: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
-  parse(context: PackingContext): ErrorCode | Promise<ErrorCode> {
-    this.initCanvas(context.exportWidth, context.exportHeight);
-    const { context2D } = this;
-    // .atlas 对象
-    const atlasObj = { atlasItems: <any>[], format: 1 };
-    const item = {
-      img: `./temp.png`,
-      sprites: <any>[],
-    };
-    atlasObj.atlasItems.push(item);
-    const { rects, images } = context;
-    const { sprites } = item;
-    const { padding } = context.option;
-    for (let i = 0, l = rects.length; i < l; ++i) {
-      const rect = rects[i];
-      sprites.push({
-        name: rect.name,
-        atlasRotated: rect.isRotated,
-        atlasRegion: {
-          x: rect.x,
-          y: rect.y,
-          w: rect.width,
-          h: rect.height,
-        },
-        originalSize: {
-          w: rect.width,
-          h: rect.height,
-        },
-      });
+  async parse(context: PackingContext): Promise<ErrorCode> {
+    const info = (context.outPut.info = new AtlasConfig());
+    const extrude = context.option.extrude;
+    const { bins } = context.packer;
+    context.outPut.imageFiles = [];
+    const atlasItems = info.atlasItems;
+    for (let i = 0, n = bins.length; i < n; i++) {
+      const bin = bins[i];
+      this.initCanvas(bin.width, bin.height);
+      const { context2D } = this;
+      const { rects } = bin;
+      const sprites = new Array<AtlasSprite>();
+      const atlasItem = {
+        img: "",
+        type: "",
+        width: bin.width,
+        height: bin.height,
+        sprites
+      };
+      for (let j = 0, m = rects.length; j < m; j++) {
+        const atlasSprite = new AtlasSprite();
+        const rect = rects[j];
+        const data = rect.data;
+        atlasSprite.name = data.name;
+        atlasSprite.atlasRotated = !!rect.rot;
+        const offsetX = (rect.x || 0) + extrude;
+        const offsetY = (rect.y || 0) + extrude;
+        const width = rect.width - 2 * extrude;
+        const height = rect.height - 2 * extrude;
+        atlasSprite.atlasRegion = {
+          x: offsetX,
+          y: offsetY,
+          w: width,
+          h: height
+        };
+        const image = data.image;
+        if (image) {
+          // Handle extrude pixels.
 
-      const name = rect.name;
-      const image = this.getImage(images, name);
-      if (image) {
-        const { width: imgW, height: imgH } = image;
-        const { x: sX, y: sY } = rect;
-        context2D.drawImage(image, 0, 0, imgW, imgH, sX, sY, imgW, imgH);
+          // Set top and bottom.
+          const topY = offsetY - extrude;
+          const bottomY = offsetY + height + extrude - 1;
+          // Set left and right.
+          const leftX = offsetX - extrude;
+          const rightX = offsetX + width + extrude - 1;
 
-        // Handle padding pixels.
-        if (padding > 0) {
-          try {
-            for (let i = 1; i <= padding; ++i) {
-              // Set top and bottom.
-              const topY = sY - i;
-              const bottomY = sY + imgH + i - 1;
-              context2D.drawImage(image, 0, 0, imgW, 1, sX, topY, imgW, 1);
-              context2D.drawImage(
-                image,
-                0,
-                imgH - 1,
-                imgW,
-                1,
-                sX,
-                bottomY,
-                imgW,
-                1
-              );
+          // border
+          context2D.drawImage(image, 0, 0, width, 1, offsetX, topY, width, extrude);
+          // context2D.drawImage(image, 0, height - 1, width, 1, offsetX, bottomY, width, extrude);
+          context2D.drawImage(image, 0, 0, 1, height, leftX, offsetY, extrude, height);
+          // context2D.drawImage(image, width - 1, 0, 1, height, rightX, offsetY, extrude, height);
 
-              // Set left and right.
-              const leftX = sX - i;
-              const rightX = sX + imgW + i - 1;
-              context2D.drawImage(image, 0, 0, 1, imgH, leftX, sY, 1, imgH);
-              context2D.drawImage(
-                image,
-                imgW - 1,
-                0,
-                1,
-                imgH,
-                rightX,
-                sY,
-                1,
-                imgH
-              );
-            }
-          } catch (error) {
-            console.error(JSON.stringify(error));
-          }
+          // corner
+          // context2D.drawImage(image, 0, 0, 1, 1, offsetX, topY, width, extrude);
+          // context2D.drawImage(image, 0, height - 1, width, 1, offsetX, bottomY, width, extrude);
+          // context2D.drawImage(image, 0, 0, 1, height, leftX, offsetY, extrude, height);
+          // context2D.drawImage(image, width - 1, 0, 1, height, rightX, offsetY, extrude, height);
+
+          context2D.drawImage(image, 0, 0, width, height, offsetX, offsetY, width, height);
         }
+        sprites.push(atlasSprite);
+      }
+      const arrayBuffer = await this.drawCanvas();
+      if (!arrayBuffer) {
+        return ErrorCode.CanvasBlobError;
+      } else {
+        context.outPut.imageFiles.push(arrayBuffer);
+        atlasItems.push(atlasItem);
       }
     }
+    return ErrorCode.Success;
+  }
 
-    return new Promise<ErrorCode>((resolve, reject) => {
+  initCanvas(exportWidth: number, exportHeight: number) {
+    if (!this.canvas) {
+      try {
+        this.canvas = new OffscreenCanvas(exportWidth, exportHeight);
+      } catch (error) {
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = exportWidth;
+        this.canvas.height = exportHeight;
+      }
+      this.context2D = this.canvas.getContext("2d") as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+    } else {
+      if (this.canvas.width !== exportWidth || this.canvas.height !== exportHeight) {
+        this.canvas.width = exportWidth;
+        this.canvas.height = exportHeight;
+      } else {
+        this.context2D.clearRect(0, 0, exportWidth, exportHeight);
+      }
+    }
+  }
+
+  async drawCanvas() {
+    return new Promise<ArrayBuffer>((resolve, reject) => {
       if (this.canvas instanceof HTMLCanvasElement) {
         this.canvas.toBlob(
           (blob) => {
             blob
               .arrayBuffer()
               .then((value: ArrayBuffer) => {
-                context.outPut.info.imageFiles = [value];
-                context.outPut.info.atlasFile = JSON.stringify(atlasObj);
-                resolve(ErrorCode.Success);
+                resolve(value);
               })
               .catch((reason: any) => {
                 console.error(JSON.stringify(reason));
-                reject(ErrorCode.CanvasBlobError);
+                reject(null);
               });
           },
           "image/png",
@@ -115,55 +125,18 @@ export class OptDrawing extends OptHandler {
             blob
               .arrayBuffer()
               .then((value: ArrayBuffer) => {
-                context.outPut.info.imageFiles = [value];
-                context.outPut.info.atlasFile = JSON.stringify(atlasObj);
-                resolve(ErrorCode.Success);
+                resolve(value);
               })
               .catch((reason: any) => {
                 console.error(JSON.stringify(reason));
-                reject(ErrorCode.OffscreenBlobError);
+                reject(null);
               });
           })
           .catch((reason: any) => {
             console.error(JSON.stringify(reason));
-            reject(ErrorCode.OffscreenBlobError);
+            reject(null);
           });
       }
     });
-  }
-
-  getImage(images: PackingItem[], name: string): HTMLImageElement {
-    for (let i = images.length - 1; i >= 0; i--) {
-      const image = images[i];
-      if (image.name === name) {
-        return image.image;
-      }
-    }
-    return null;
-  }
-
-  initCanvas(exportWidth: number, exportHeight: number) {
-    if (!this.canvas) {
-      try {
-        this.canvas = new OffscreenCanvas(exportWidth, exportHeight);
-      } catch (error) {
-        this.canvas = document.createElement("canvas");
-        this.canvas.width = exportWidth;
-        this.canvas.height = exportHeight;
-      }
-      this.context2D = this.canvas.getContext("2d") as
-        | CanvasRenderingContext2D
-        | OffscreenCanvasRenderingContext2D;
-    } else {
-      if (
-        this.canvas.width !== exportWidth ||
-        this.canvas.height !== exportHeight
-      ) {
-        this.canvas.width = exportWidth;
-        this.canvas.height = exportHeight;
-      } else {
-        this.context2D.clearRect(0, 0, exportWidth, exportHeight);
-      }
-    }
   }
 }

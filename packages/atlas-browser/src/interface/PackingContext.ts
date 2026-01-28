@@ -1,4 +1,4 @@
-import { Rect } from "@galacean/tools-atlas-algorithm";
+import { MaxRectsPacker } from "maxrects-packer";
 import { PackingOption } from "../interface/PackingOption";
 import { PackingItem } from "./PackingItem";
 import { PackingOutput } from "./PackingOutput";
@@ -6,8 +6,6 @@ import { PackingOutput } from "./PackingOutput";
 export interface PackingContext {
   images: PackingItem[];
   option: PackingOption;
-  rects?: Rect[];
-  exportWidth?: number;
-  exportHeight?: number;
-  outPut?: PackingOutput;
+  outPut: PackingOutput;
+  packer?: MaxRectsPacker;
 }

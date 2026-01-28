@@ -21,6 +21,7 @@
     "types/**/*"
   ],
   "dependencies": {
-    "@galacean/tools-atlas-algorithm": "workspace:*"
+    "@galacean/tools-atlas-algorithm": "workspace:*",
+    "maxrects-packer": "2.7.3"
   }
 }
