@@ -3,7 +3,7 @@ import Jimp from "jimp";
 import { Rect } from "../Rect";
 import { MaxRectsMethod } from "../enums/MaxRectsMethod";
 import { AtlasFormat } from "../enums/AtlasFormat";
-import { MaxRectsBinPack } from "./MaxRectsBinPack";
+import { SmartRectsBinPack } from "./SmartRectsBinPack";
 import { Exporter } from "./Exporter";
 
 const POTS = [
@@ -82,11 +82,8 @@ export class MaxRectsPacker {
       }
     }
 
-    this._pack = new MaxRectsBinPack(
-      this._width,
-      this._height,
-      this._allowRotate
-    );
+    this._pack = new SmartRectsBinPack();
+    this._pack.init(this._width, this._height, this._allowRotate);
     this._exporter = new Exporter(option.format);
   }
 

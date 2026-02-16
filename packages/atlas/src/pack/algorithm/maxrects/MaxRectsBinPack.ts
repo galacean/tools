@@ -13,6 +13,7 @@
  */
 import { MaxRectsMethod } from "../enums/MaxRectsMethod";
 import { Rect } from "../Rect";
+import type { IMaxRectsBinPack } from "./IMaxRectsBinPack";
 
 interface Score {
   value: number;
@@ -21,7 +22,7 @@ interface Score {
 /**
  * MaxRectanglesBinPack
  */
-export class MaxRectsBinPack {
+export class MaxRectsBinPack implements IMaxRectsBinPack {
   binWidth: number;
   binHeight: number;
   allowRotate: boolean;
@@ -658,4 +659,3 @@ export class MaxRectsBinPack {
     }
   }
 }
-

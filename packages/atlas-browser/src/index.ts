@@ -1,3 +1,4 @@
+import { MaxRectsMethod } from "@galacean/tools-atlas-algorithm";
 import { ErrorCode } from "./enum/ErrorCode";
 import { type PackingItem } from "./interface/PackingItem";
 import { type PackingOption } from "./interface/PackingOption";
@@ -11,10 +12,10 @@ const DefaultOption = {
   width: 2048,
   height: 2048,
   padding: 0,
-  extrude: 2,
   allowRotate: false,
   square: false,
-  pot: false
+  pot: false,
+  method: MaxRectsMethod.BestLongSideFit
 };
 
 /**

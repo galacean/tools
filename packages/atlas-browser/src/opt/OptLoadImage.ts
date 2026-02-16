@@ -7,7 +7,7 @@ export class OptLoadImage extends OptHandler {
   parse(context: PackingContext): Promise<ErrorCode> {
     return new Promise<ErrorCode>((resolve, reject) => {
       const { images } = context;
-      const { width: maxWidth, height: maxHeight } = context.option;
+      const { width: maxWidth, height: maxHeight, allowRotate } = context.option;
       // 第一步：加载所有的图片
       const imagesLength = images.length;
       const promiseArray: Promise<HTMLImageElement>[] = [];
@@ -28,7 +28,10 @@ export class OptLoadImage extends OptHandler {
         .then((imgs) => {
           for (let j = 0, m = imgs.length; j < m; j++) {
             const img = imgs[j];
-            if (img.width > maxWidth || img.height > maxHeight) {
+            const canFit =
+              (img.width <= maxWidth && img.height <= maxHeight) ||
+              (!!allowRotate && img.height <= maxWidth && img.width <= maxHeight);
+            if (!canFit) {
               reject(ErrorCode.PackError);
               return;
             }
