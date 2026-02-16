@@ -2,6 +2,12 @@ import hammersley from "./hammersley";
 import importanceSampling from "./importanceSampling";
 
 export default `
+#include <common>
+
+vec4 RGBEToLinear(vec4 value) {
+    return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
+}
+    
 varying vec2 v_uv;
 
 uniform samplerCube environmentMap;
@@ -9,35 +15,14 @@ uniform float face;
 uniform float lodRoughness;
 uniform float u_textureSize;
 
-#define PI 3.14159265359
-#define RECIPROCAL_PI 0.31830988618
-
 const uint SAMPLE_COUNT = 4096u;
-
-
-float pow2( const in float x ) {
-    return x * x;
-}
-
-vec4 RGBEToLinear(vec4 value) {
-    return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
-}
-
-vec4 RGBMToLinear(vec4 value, float maxRange ) {
-    return vec4( value.rgb * value.a * maxRange, 1.0 );
-}
-
-
-vec4 gammaToLinear(vec4 srgbIn){
-    return vec4( pow(srgbIn.rgb, vec3(2.2)), srgbIn.a);
-}
 
 vec4 toLinear(vec4 color){
     vec4 linear;
     #if (DECODE_MODE == 0)
         linear = color;
     #elif (DECODE_MODE == 1)
-        linear = gammaToLinear(color);
+        linear = sRGBToLinear(color);
     #elif (DECODE_MODE == 2)
         linear = RGBEToLinear(color);
     #elif (DECODE_MODE == 3)
