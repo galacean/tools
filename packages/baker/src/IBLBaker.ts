@@ -69,7 +69,7 @@ export class IBLBaker {
     bakerRenderer.mesh = PrimitiveMesh.createPlane(engine, 2, 2);
     bakerRenderer.setMaterial(bakerMaterial);
 
-    const RTTBake = new TextureCube(engine, resolution, undefined, undefined, false);
+    const RTTBake = new TextureCube(engine, resolution, TextureFormat.R16G16B16A16, undefined, false);
     RTTBake.filterMode = TextureFilterMode.Trilinear;
     const RTBake = new RenderTarget(engine, resolution, resolution, RTTBake);
     RTBake.autoGenerateMipmaps = false;
@@ -129,7 +129,7 @@ export class IBLBaker {
     bakerRenderer.mesh = PrimitiveMesh.createPlane(engine, 2, 2);
     bakerRenderer.setMaterial(bakerMaterial);
 
-    const renderColorTexture = new TextureCube(engine, resolution, undefined, undefined, false);
+    const renderColorTexture = new TextureCube(engine, resolution, TextureFormat.R16G16B16A16, undefined, false);
     texture.filterMode = TextureFilterMode.Trilinear;
     renderColorTexture.filterMode = TextureFilterMode.Trilinear;
     const renderTarget = new RenderTarget(engine, resolution, resolution, renderColorTexture);

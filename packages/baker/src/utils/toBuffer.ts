@@ -8,23 +8,23 @@ export function toBuffer(bakedTexture: TextureCube, sh: SphericalHarmonics3): Ar
   const floatByteLenth = 27 * 4;
   sh.copyToArray(float32Array);
 
-  const uint8Arrays = [];
-  let uint8ByteLength = 0;
+  const uint16Arrays = [];
+  let uint16ByteLength = 0;
 
   for (let mipLevel = 0; mipLevel < mipmapCount; mipLevel++) {
     const mipSize = size >> mipLevel;
 
     for (let face = 0; face < 6; face++) {
       const dataSize = mipSize * mipSize * 4;
-      const data = new Uint8Array(dataSize);
+      const data = new Uint16Array(dataSize);
       bakedTexture.getPixelBuffer(TextureCubeFace.PositiveX + face, 0, 0, mipSize, mipSize, mipLevel, data);
-      uint8Arrays.push(data);
-      uint8ByteLength += dataSize;
+      uint16Arrays.push(data);
+      uint16ByteLength += dataSize * 2;
     }
   }
 
   // sh + size + mipData
-  const arrayBuffer = new ArrayBuffer(floatByteLenth + 2 + uint8ByteLength);
+  const arrayBuffer = new ArrayBuffer(floatByteLenth + 2 + uint16ByteLength);
   const shDataView = new DataView(arrayBuffer, 0, floatByteLenth);
   const mipDataView = new DataView(arrayBuffer, floatByteLenth);
 
@@ -35,10 +35,11 @@ export function toBuffer(bakedTexture: TextureCube, sh: SphericalHarmonics3): Ar
   mipDataView.setUint16(0, size, true);
 
   let offset = 2;
-  for (let i = 0; i < uint8Arrays.length; i++) {
-    const uint8Array = uint8Arrays[i];
-    for (let j = 0, length = uint8Array.length; j < length; j++) {
-      mipDataView.setUint8(offset++, uint8Array[j]);
+  for (let i = 0; i < uint16Arrays.length; i++) {
+    const uint16Array = uint16Arrays[i];
+    for (let j = 0, length = uint16Array.length; j < length; j++) {
+      mipDataView.setUint16(offset, uint16Array[j], true);
+      offset += 2;
     }
   }
 

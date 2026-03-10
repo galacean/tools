@@ -25,18 +25,9 @@ vec4 toLinear(vec4 color){
         linear = sRGBToLinear(color);
     #elif (DECODE_MODE == 2)
         linear = RGBEToLinear(color);
-    #elif (DECODE_MODE == 3)
-        linear = RGBMToLinear(color, 5.0);
     #endif
 
     return linear;
-}
-
-vec4 LinearToRGBM(vec4 value, float maxRange ) {
-    float maxRGB = max( value.r, max( value.g, value.b ) );
-    float M = clamp( maxRGB / maxRange, 0.0, 1.0 );
-    M = ceil( M * 255.0 ) / 255.0;
-    return vec4( value.rgb / ( M * maxRange ), M );
 }
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
@@ -128,7 +119,5 @@ void main()
         vec3 integratedBRDF = specular(dir);
         gl_FragColor = vec4(integratedBRDF, 1.);
     }
-    
-    gl_FragColor = LinearToRGBM(gl_FragColor, 5.0);
 }
 `;
