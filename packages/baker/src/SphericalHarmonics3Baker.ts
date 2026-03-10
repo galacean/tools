@@ -39,7 +39,7 @@ export class SphericalHarmonics3Baker {
       textureSize
     );
 
-    // Filament: apply SH deringing (sinc windowing) to eliminate ringing artifacts
+    // Apply SH deringing (sinc windowing) to eliminate ringing artifacts
     const shArray = new Float32Array(result);
     windowSH(shArray);
 
@@ -72,8 +72,7 @@ export function addSH(direction: number[], color: number[], deltaSolidAngle: num
   const g = color[1] * deltaSolidAngle;
   const b = color[2] * deltaSolidAngle;
 
-  // SH basis functions (real, 3 bands)
-  // Matches Filament's computeShBasis() with Ki() normalization
+  // SH basis functions (real, orthonormal, 3 bands)
   const bv0 = 0.282095; // K(0,0) = 1/(2*sqrt(pi))
   const bv1 = -0.488603 * y; // K(1,1) * sqrt(2) * y * (-1)
   const bv2 = 0.488603 * z; // K(0,1) * z
@@ -96,8 +95,8 @@ export function addSH(direction: number[], color: number[], deltaSolidAngle: num
   (sh[21] += r * bv7), (sh[22] += g * bv7), (sh[23] += b * bv7);
   (sh[24] += r * bv8), (sh[25] += g * bv8), (sh[26] += b * bv8);
 }
-// Filament: exact solid angle of a cubemap texel projected onto the unit sphere.
-// See CubemapUtils::solidAngle() in filament/libs/ibl/src/CubemapUtils.cpp
+// Exact solid angle of a cubemap texel projected onto the unit sphere.
+// See: Manne Öhrström, "Cubemap Texel Solid Angle"
 export function sphereQuadrantArea(x: number, y: number): number {
   return Math.atan2(x * y, Math.sqrt(x * x + y * y + 1));
 }
@@ -117,11 +116,9 @@ export function solidAngle(dim: number, u: number, v: number): number {
 }
 
 /**
- * Filament: SH deringing via sinc windowing.
- * See "Deringing Spherical Harmonics" by Peter-Pike Sloan
+ * SH deringing via sinc windowing.
+ * See: Peter-Pike Sloan, "Deringing Spherical Harmonics"
  * https://www.ppsloan.org/publications/shdering.pdf
- *
- * Ported from filament/libs/ibl/src/CubemapSH.cpp
  */
 
 // SH index mapping for 3 bands: SHindex(m, l)
@@ -140,8 +137,7 @@ function sincWindow(l: number, w: number): number {
   return Math.pow(x, 4);
 }
 
-// Rotate SH band 1 (3 coefficients) by matrix M
-// Ported from Filament's rotateShericalHarmonicBand1
+// Rotate SH band 1 (3 coefficients) by rotation matrix M
 function rotateSHBand1(band1: number[], M: number[][]): number[] {
   // invA1TimesK = {{0,-1,0},{0,0,1},{-1,0,0}}
   // invA1TimesK * band1
@@ -157,8 +153,7 @@ function rotateSHBand1(band1: number[], M: number[][]): number[] {
   return [r0, r1, r2];
 }
 
-// Rotate SH band 2 (5 coefficients) by matrix M
-// Ported from Filament's rotateShericalHarmonicBand2
+// Rotate SH band 2 (5 coefficients) by rotation matrix M
 function rotateSHBand2(band2: number[], M: number[][]): number[] {
   const M_SQRT_3 = 1.7320508076;
   const SQRT1_2 = Math.SQRT1_2;
@@ -338,7 +333,7 @@ function applyWindowing(f: number[], cutoff: number): number[] {
 }
 
 /**
- * Filament: Auto-windowed SH deringing.
+ * Auto-windowed SH deringing.
  * Uses binary search to find optimal sinc window cutoff that eliminates negative values.
  * Applied per-channel on the 27-element SH array (9 coefficients * 3 channels RGB).
  */
@@ -394,7 +389,7 @@ export function scaleSH(array: Float32Array, scale: number): void {
   (src[24] *= scale), (src[25] *= scale), (src[26] *= scale);
 }
 
-// Filament-style SH computation with exact solid angle calculation.
+// SH computation with exact solid angle calculation.
 export function decodeFaceSH(
   faceData: Uint16Array,
   faceIndex: TextureCubeFace,
@@ -416,7 +411,7 @@ export function decodeFaceSH(
       color[1] = halfToFloat(faceData[dataOffset + 1]);
       color[2] = halfToFloat(faceData[dataOffset + 2]);
 
-      // Compute texel center in [-1, 1] range (Filament convention)
+      // Compute texel center in [-1, 1] range
       const iDim = 1.0 / textureSize;
       const u = ((x + 0.5) * 2 * iDim) - 1;
       const v = ((y + 0.5) * 2 * iDim) - 1;
@@ -462,7 +457,7 @@ export function decodeFaceSH(
       direction[1] /= directionLength;
       direction[2] /= directionLength;
 
-      // Filament: exact solid angle via sphereQuadrantArea
+      // Exact solid angle via sphereQuadrantArea
       const sa = solidAngle(textureSize, x, y);
       solidAngleSum += sa;
       addSH(direction, color, sa, sh);

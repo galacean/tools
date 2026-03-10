@@ -16,9 +16,9 @@ uniform float lodRoughness;
 uniform float u_textureSize;
 
 const uint SAMPLE_COUNT = 4096u;
-const float MIN_ROUGHNESS = 0.002025; // Filament desktop minimum
+const float MIN_ROUGHNESS = 0.002025; // = 0.045² (perceptualRoughness minimum squared)
 
-// Filament HDR compression defaults
+// HDR luminance compression thresholds
 const float HDR_LINEAR = 1024.0;   // no compression below this luminance
 const float HDR_MAX = 16384.0;     // compress between HDR_LINEAR and HDR_MAX
 
@@ -35,8 +35,8 @@ vec4 toLinear(vec4 color){
     return linear;
 }
 
-// Filament: HDR luminance-based tone compression (Brian Karis)
-// See: http://graphicrants.blogspot.com/2013/12/tone-mapping.html
+// HDR luminance-based tone compression
+// See: Brian Karis, http://graphicrants.blogspot.com/2013/12/tone-mapping.html
 vec3 compressHDR(const in vec3 color) {
     const vec3 rec709 = vec3(0.2126, 0.7152, 0.0722);
     float luma = dot(color, rec709);
@@ -47,7 +47,7 @@ vec3 compressHDR(const in vec3 color) {
     return color * s;
 }
 
-// Filament: DistributionGGX
+// GGX normal distribution function
 // NOTE: (aa-1) == (a-1)(a+1) produces better fp accuracy
 float D_GGX( const in float a, const in float NoH ) {
     float f = (a - 1.0) * ((a + 1.0) * (NoH * NoH)) + 1.0;
@@ -58,9 +58,9 @@ float D_GGX( const in float a, const in float NoH ) {
 ${hammersley}
 ${importanceSampling}
 
-// Filament: Pre-filtered importance sampling
-// see: "Real-time Shading with Filtered Importance Sampling", Jaroslav Krivanek
-// see: "GPU-Based Importance Sampling, GPU Gems 3", Mark Colbert
+// Pre-filtered importance sampling
+// See: Krivanek, "Real-time Shading with Filtered Importance Sampling"
+// See: Colbert, "GPU-Based Importance Sampling", GPU Gems 3
 vec3 specular(vec3 N) {
     vec3 V = N;
 
@@ -82,14 +82,14 @@ vec3 specular(vec3 N) {
         {
             float NoH = max(dot(N, H), 0.0);
 
-            // Filament: pdf = D(NoH, roughness) / 4
+            // pdf = D(NoH, roughness) / 4
             // Since V == N, VoH == NoH, Jacobian 1/(4*VoH) cancels with NoH in numerator
             float pdf = D_GGX(max(MIN_ROUGHNESS, lodRoughness), NoH) * 0.25;
 
             // Solid angle of this importance sample
             float omegaS = 1.0 / (float(SAMPLE_COUNT) * pdf);
 
-            // Filament: K = 4 LOD bias for overlapping samples (log4(4) = 1)
+            // K = 4 LOD bias for overlapping samples (Krivanek)
             // lod = log4(K * omegaS / omegaP) = 1.0 + 0.5 * log2(omegaS / omegaP)
             float mipLevel = 1.0 + 0.5 * log2(omegaS / omegaP);
             mipLevel = max(mipLevel, 0.0);

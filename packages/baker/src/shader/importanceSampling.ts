@@ -4,7 +4,7 @@ vec3 importanceSampleGGX(vec2 Xi, vec3 N, float roughness)
     float a = roughness * roughness;
 
     float phi = 2.0 * PI * Xi.x;
-    // NOTE: (aa-1) == (a-1)(a+1) produces better fp accuracy (Filament)
+    // NOTE: (aa-1) == (a-1)(a+1) produces better fp accuracy
     float cosTheta2 = (1.0 - Xi.y) / (1.0 + (a + 1.0) * ((a - 1.0) * Xi.y));
     float cosTheta = sqrt(cosTheta2);
     float sinTheta = sqrt(1.0 - cosTheta2);
