@@ -1,6 +1,5 @@
-import { Color, SphericalHarmonics3, TextureCube, TextureCubeFace } from "@galacean/engine";
+import { SphericalHarmonics3, TextureCube, TextureCubeFace } from "@galacean/engine";
 import { WorkerManager } from "./WorkerManager";
-import { DecodeMode } from "./enums/DecodeMode";
 
 /**
  * Bake irradiance into spherical harmonics3 and use WebWorker.
@@ -12,23 +11,18 @@ export class SphericalHarmonics3Baker {
    * Bake from Cube texture and use WebWorker.
    * @param texture - Cube texture
    * @param out - SH3 for output
-   * @param decodeMode - Mode of decoding texture cube, default DecodeMode.RGBM
    */
-  static async fromTextureCube(
-    texture: TextureCube,
-    out: SphericalHarmonics3,
-    decodeMode: DecodeMode = DecodeMode.RGBM
-  ): Promise<SphericalHarmonics3> {
+  static async fromTextureCube(texture: TextureCube, out: SphericalHarmonics3): Promise<SphericalHarmonics3> {
     const channelLength = 4;
     const textureSize = texture.width;
 
     // read pixel always return rgba
-    const dataPX = new Uint8Array(textureSize * textureSize * channelLength);
-    const dataNX = new Uint8Array(textureSize * textureSize * channelLength);
-    const dataPY = new Uint8Array(textureSize * textureSize * channelLength);
-    const dataNY = new Uint8Array(textureSize * textureSize * channelLength);
-    const dataPZ = new Uint8Array(textureSize * textureSize * channelLength);
-    const dataNZ = new Uint8Array(textureSize * textureSize * channelLength);
+    const dataPX = new Uint16Array(textureSize * textureSize * channelLength);
+    const dataNX = new Uint16Array(textureSize * textureSize * channelLength);
+    const dataPY = new Uint16Array(textureSize * textureSize * channelLength);
+    const dataNY = new Uint16Array(textureSize * textureSize * channelLength);
+    const dataPZ = new Uint16Array(textureSize * textureSize * channelLength);
+    const dataNZ = new Uint16Array(textureSize * textureSize * channelLength);
     texture.getPixelBuffer(TextureCubeFace.PositiveX, 0, 0, textureSize, textureSize, 0, dataPX);
     texture.getPixelBuffer(TextureCubeFace.NegativeX, 0, 0, textureSize, textureSize, 0, dataNX);
     texture.getPixelBuffer(TextureCubeFace.PositiveY, 0, 0, textureSize, textureSize, 0, dataPY);
@@ -42,42 +36,29 @@ export class SphericalHarmonics3Baker {
       dataNY,
       dataPZ,
       dataNZ,
-      textureSize,
-      decodeMode
+      textureSize
     );
     out.copyFromArray(result);
     return out;
   }
 }
 
-export function RGBEToLinear(r: number, g: number, b: number, a: number, color: number[]) {
-  if (a === 0) {
-    color[0] = color[1] = color[2] = 0;
-    color[3] = 1;
-  } else {
-    const scale = Math.pow(2, a - 128) / 255;
-    color[0] = r * scale;
-    color[1] = g * scale;
-    color[2] = b * scale;
-    color[3] = 1;
-  }
-}
-export function RGBMToLinear(r: number, g: number, b: number, a: number, color: number[]) {
-  const scale = a / 13005; // (a * 5) / 255 / 255;
-  color[0] = r * scale;
-  color[1] = g * scale;
-  color[2] = b * scale;
-  color[3] = 1;
-}
-export function gammaToLinearSpace(value: number): number {
-  // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_framebuffer_sRGB.txt
-  // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_sRGB_decode.txt
+export function halfToFloat(halfBits: number): number {
+  const sign = halfBits & 0x8000 ? -1 : 1;
+  const exponent = (halfBits >> 10) & 0x1f;
+  const mantissa = halfBits & 0x03ff;
 
-  if (value <= 0.0) return 0.0;
-  else if (value <= 0.04045) return value / 12.92;
-  else if (value < 1.0) return Math.pow((value + 0.055) / 1.055, 2.4);
-  else return Math.pow(value, 2.4);
+  if (exponent === 0x1f) {
+    return mantissa === 0 ? sign * Infinity : NaN;
+  }
+
+  if (exponent === 0) {
+    return sign * 2 ** -14 * (mantissa / 1024);
+  }
+
+  return sign * 2 ** (exponent - 15) * (1 + mantissa / 1024);
 }
+
 export function addSH(direction: number[], color: number[], deltaSolidAngle: number, sh: Float32Array): void {
   const x = direction[0];
   const y = direction[1];
@@ -121,9 +102,8 @@ export function scaleSH(array: Float32Array, scale: number): void {
 }
 
 export function decodeFaceSH(
-  faceData: Uint8Array,
+  faceData: Uint16Array,
   faceIndex: TextureCubeFace,
-  decodeMode: DecodeMode,
   textureSize: number,
   lastSolidAngleSum: number,
   sh: Float32Array // length 27
@@ -140,38 +120,11 @@ export function decodeFaceSH(
     let u = texelSize * 0.5 - 1;
     for (let x = 0; x < textureSize; x++) {
       const dataOffset = y * textureSize * channelLength + x * channelLength;
-      switch (decodeMode) {
-        case 0:
-          color[0] = faceData[dataOffset];
-          color[1] = faceData[dataOffset + 1];
-          color[2] = faceData[dataOffset + 2];
-          color[3] = 0;
-          break;
-        case 1:
-          color[0] = gammaToLinearSpace(faceData[dataOffset] / 255);
-          color[1] = gammaToLinearSpace(faceData[dataOffset + 1] / 255);
-          color[2] = gammaToLinearSpace(faceData[dataOffset + 2] / 255);
-          color[3] = 0;
-          break;
-        case 2:
-          RGBEToLinear(
-            faceData[dataOffset],
-            faceData[dataOffset + 1],
-            faceData[dataOffset + 2],
-            faceData[dataOffset + 3],
-            color
-          );
-          break;
-        case 3:
-          RGBMToLinear(
-            faceData[dataOffset],
-            faceData[dataOffset + 1],
-            faceData[dataOffset + 2],
-            faceData[dataOffset + 3],
-            color
-          );
-          break;
-      }
+      //  Linear (half-float)
+      color[0] = halfToFloat(faceData[dataOffset]);
+      color[1] = halfToFloat(faceData[dataOffset + 1]);
+      color[2] = halfToFloat(faceData[dataOffset + 2]);
+      color[3] = 1;
 
       switch (faceIndex) {
         case 0:
