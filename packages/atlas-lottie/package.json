@@ -7,7 +7,8 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "main": "dist/main.js"
   },
   "homepage": "https://oasisengine.cn/",
   "repository": {
@@ -18,7 +19,7 @@
   "scripts": {
     "lint:fix": "tslint --fix --project ./tsconfig.json"
   },
-  "main": "dist/main.js",
+  "main": "src/index.js",
   "files": [
     "dist/**/*",
     "types/**/*"
