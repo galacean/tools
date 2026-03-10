@@ -2,7 +2,9 @@ import {
   addSH,
   decodeFaceSH,
   halfToFloat,
-  scaleSH
+  scaleSH,
+  solidAngle,
+  sphereQuadrantArea
 } from "./SphericalHarmonics3Baker";
 
 // Only open one worker for one task now.
@@ -85,7 +87,7 @@ export class WorkerManager {
   ): Promise<number[]> {
     return new Promise((resolve) => {
       const taskID = this._taskID++;
-      const worker = this.getWorker([halfToFloat, addSH, scaleSH, decodeFaceSH]);
+      const worker = this.getWorker([halfToFloat, sphereQuadrantArea, solidAngle, addSH, scaleSH, decodeFaceSH]);
       this._callbacks[taskID] = { resolve };
 
       worker.postMessage({

@@ -16,6 +16,11 @@ uniform float lodRoughness;
 uniform float u_textureSize;
 
 const uint SAMPLE_COUNT = 4096u;
+const float MIN_ROUGHNESS = 0.002025; // Filament desktop minimum
+
+// Filament HDR compression defaults
+const float HDR_LINEAR = 1024.0;   // no compression below this luminance
+const float HDR_MAX = 16384.0;     // compress between HDR_LINEAR and HDR_MAX
 
 vec4 toLinear(vec4 color){
     vec4 linear;
@@ -30,29 +35,40 @@ vec4 toLinear(vec4 color){
     return linear;
 }
 
-// Microfacet Models for Refraction through Rough Surfaces - equation (33)
-// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-// alpha is "roughness squared" in Disney’s reparameterization
-float D_GGX( const in float alpha, const in float dotNH ) {
+// Filament: HDR luminance-based tone compression (Brian Karis)
+// See: http://graphicrants.blogspot.com/2013/12/tone-mapping.html
+vec3 compressHDR(const in vec3 color) {
+    const vec3 rec709 = vec3(0.2126, 0.7152, 0.0722);
+    float luma = dot(color, rec709);
+    float s = 1.0;
+    if (luma > HDR_LINEAR) {
+        s = ((HDR_LINEAR * HDR_LINEAR - HDR_MAX * luma) / ((2.0 * HDR_LINEAR - HDR_MAX - luma) * luma));
+    }
+    return color * s;
+}
 
-	float a2 = pow2( alpha );
-
-	float denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
-
-	return RECIPROCAL_PI * a2 / pow2( denom );
-
+// Filament: DistributionGGX
+// NOTE: (aa-1) == (a-1)(a+1) produces better fp accuracy
+float D_GGX( const in float a, const in float NoH ) {
+    float f = (a - 1.0) * ((a + 1.0) * (NoH * NoH)) + 1.0;
+    return (a * a) / (PI * f * f);
 }
 
 
 ${hammersley}
 ${importanceSampling}
 
+// Filament: Pre-filtered importance sampling
+// see: "Real-time Shading with Filtered Importance Sampling", Jaroslav Krivanek
+// see: "GPU-Based Importance Sampling, GPU Gems 3", Mark Colbert
 vec3 specular(vec3 N) {
-    vec3 R = N;
-    vec3 V = R;
+    vec3 V = N;
 
-    float totalWeight = 0.0;   
-    vec3 prefilteredColor = vec3(0.0);     
+    float totalWeight = 0.0;
+    vec3 prefilteredColor = vec3(0.0);
+
+    // Solid angle of a texel in the base cubemap
+    float omegaP = 4.0 * PI / (6.0 * u_textureSize * u_textureSize);
 
     for(uint i = 0u; i < SAMPLE_COUNT; ++i)
     {
@@ -61,18 +77,25 @@ vec3 specular(vec3 N) {
         vec3 L  = normalize(2.0 * dot(V, H) * H - V);
 
         float NdotL = max(dot(N, L), 0.0);
-        
+
         if(NdotL > 0.0)
         {
-            float dotNH = dot(N,H);
-            float D   = D_GGX(lodRoughness, dotNH);
-            float pdf = (D * dotNH / (4.0 * dotNH)) + 0.0001; 
-            float saTexel  = 4.0 * PI / (6.0 * u_textureSize * u_textureSize);
-            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
-            float mipLevel = lodRoughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
-            
+            float NoH = max(dot(N, H), 0.0);
+
+            // Filament: pdf = D(NoH, roughness) / 4
+            // Since V == N, VoH == NoH, Jacobian 1/(4*VoH) cancels with NoH in numerator
+            float pdf = D_GGX(max(MIN_ROUGHNESS, lodRoughness), NoH) * 0.25;
+
+            // Solid angle of this importance sample
+            float omegaS = 1.0 / (float(SAMPLE_COUNT) * pdf);
+
+            // Filament: K = 4 LOD bias for overlapping samples (log4(4) = 1)
+            // lod = log4(K * omegaS / omegaP) = 1.0 + 0.5 * log2(omegaS / omegaP)
+            float mipLevel = 1.0 + 0.5 * log2(omegaS / omegaP);
+            mipLevel = max(mipLevel, 0.0);
+
             vec4 samplerColor = textureCubeLodEXT(environmentMap, L, mipLevel);
-            vec3 linearColor = toLinear(samplerColor).rgb;
+            vec3 linearColor = compressHDR(toLinear(samplerColor).rgb);
 
             prefilteredColor += linearColor * NdotL;
             totalWeight      += NdotL;
@@ -114,7 +137,7 @@ void main()
 
 
     if (lodRoughness == 0.) {
-        gl_FragColor = toLinear(textureCube(environmentMap, dir));
+        gl_FragColor = vec4(compressHDR(toLinear(textureCube(environmentMap, dir)).rgb), 1.0);
     } else {
         vec3 integratedBRDF = specular(dir);
         gl_FragColor = vec4(integratedBRDF, 1.);
