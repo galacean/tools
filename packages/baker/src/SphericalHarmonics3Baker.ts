@@ -154,56 +154,46 @@ function rotateSHBand1(band1: number[], M: number[][]): number[] {
 }
 
 // Rotate SH band 2 (5 coefficients) by rotation matrix M
+// M is column-major: M[col][row], so M[i] is the i-th column vector
+// Method: R2 = R2OverK * invATimesK, where k cancels out
+// See: Ivanic & Ruedenberg, "Rotation Matrices for Real Spherical Harmonics"
 function rotateSHBand2(band2: number[], M: number[][]): number[] {
-  const M_SQRT_3 = 1.7320508076;
-  const SQRT1_2 = Math.SQRT1_2;
+  const SQRT_3 = 1.7320508076;
+  const n = Math.SQRT1_2;
 
-  // invATimesK (5x5 matrix, rows)
+  // Project a 3D direction into 5 SH band-2 basis functions (divided by k)
+  function project(x: number, y: number, z: number): number[] {
+    return [
+      y * x,
+      -(y * z),
+      (1 / (2 * SQRT_3)) * (3 * z * z - 1),
+      -(z * x),
+      0.5 * (x * x - y * y)
+    ];
+  }
+
+  // Construct R2OverK by projecting 5 rotated reference directions
+  // Each reference direction Ni is transformed by M, then projected to SH2
+  const m0 = M[0], m1 = M[1], m2 = M[2]; // column vectors of M
+  const R2OverK = [
+    project(m0[0], m0[1], m0[2]),                                       // M * (1, 0, 0)
+    project(m2[0], m2[1], m2[2]),                                       // M * (0, 0, 1)
+    project(n * (m0[0] + m1[0]), n * (m0[1] + m1[1]), n * (m0[2] + m1[2])), // M * (n, n, 0)
+    project(n * (m0[0] + m2[0]), n * (m0[1] + m2[1]), n * (m0[2] + m2[2])), // M * (n, 0, n)
+    project(n * (m1[0] + m2[0]), n * (m1[1] + m2[1]), n * (m1[2] + m2[2]))  // M * (0, n, n)
+  ];
+
+  // invATimesK (5x5, precomputed with Mathematica)
+  // k factor cancels: R2OverK * invATimesK = (R2/k) * (invA*k) = R2 * invA
   const invATimesK = [
     [0, 1, 2, 0, 0],
     [-1, 0, 0, 0, -2],
-    [0, M_SQRT_3, 0, 0, 0],
+    [0, SQRT_3, 0, 0, 0],
     [1, 1, 0, -2, 0],
     [2, 1, 0, 0, 0]
   ];
 
-  // project: vec3 s -> 5 SH2/k coefficients
-  function project(s: number[]): number[] {
-    return [
-      s[1] * s[0],
-      -(s[1] * s[2]),
-      (1 / (2 * M_SQRT_3)) * (3 * s[2] * s[2] - 1),
-      -(s[2] * s[0]),
-      0.5 * (s[0] * s[0] - s[1] * s[1])
-    ];
-  }
-
-  // 5 reference directions
-  const N0 = [1, 0, 0];
-  const N1 = [0, 0, 1];
-  const N2 = [SQRT1_2, SQRT1_2, 0];
-  const N3 = [SQRT1_2, 0, SQRT1_2];
-  const N4 = [0, SQRT1_2, SQRT1_2];
-
-  // Transform each reference direction by M and project
-  function mulMat3Vec3(mat: number[][], v: number[]): number[] {
-    return [
-      mat[0][0] * v[0] + mat[1][0] * v[1] + mat[2][0] * v[2],
-      mat[0][1] * v[0] + mat[1][1] * v[1] + mat[2][1] * v[2],
-      mat[0][2] * v[0] + mat[1][2] * v[1] + mat[2][2] * v[2]
-    ];
-  }
-
-  const MN0 = mulMat3Vec3(M, N0);
-  const MN1 = mulMat3Vec3(M, N1);
-  const MN2 = mulMat3Vec3(M, N2);
-  const MN3 = mulMat3Vec3(M, N3);
-  const MN4 = mulMat3Vec3(M, N4);
-
-  // R2OverK: 5x5 where each row is project(MNi)
-  const R2OverK = [project(MN0), project(MN1), project(MN2), project(MN3), project(MN4)];
-
-  // invATimesK * band2 (5-vector)
+  // t = invATimesK * band2
   const t: number[] = [0, 0, 0, 0, 0];
   for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
@@ -211,7 +201,7 @@ function rotateSHBand2(band2: number[], M: number[][]): number[] {
     }
   }
 
-  // R2OverK * t
+  // result = R2OverK * t
   const result: number[] = [0, 0, 0, 0, 0];
   for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
