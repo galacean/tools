@@ -137,7 +137,7 @@ void main()
 
 
     if (lodRoughness == 0.) {
-        gl_FragColor = vec4(compressHDR(toLinear(textureCube(environmentMap, dir)).rgb), 1.0);
+        gl_FragColor = vec4(toLinear(textureCube(environmentMap, dir)).rgb, 1.0);
     } else {
         vec3 integratedBRDF = specular(dir);
         gl_FragColor = vec4(integratedBRDF, 1.);
