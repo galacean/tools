@@ -6,19 +6,7 @@ import { AtlasFormat } from "../enums/AtlasFormat";
 import { SmartRectsBinPack } from "./SmartRectsBinPack";
 import { Exporter } from "./Exporter";
 
-const POTS = [
-  2048,
-  1024,
-  512,
-  256,
-  128,
-  64,
-  32,
-  16,
-  8,
-  4,
-  2
-];
+const POTS = [2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2];
 
 export interface MaxRectsOption {
   width: number;
@@ -157,18 +145,14 @@ export class MaxRectsPacker {
 
     if (this._rectsCount !== this.packedRects.length) {
       ret.code = 1;
-      ret.msg = 'Atlas exceeds maximum size';
+      ret.msg = "Atlas exceeds maximum size";
       return ret;
     }
 
-    const fileInfo = await this._exporter.export(
-      version,
-      output,
-      this
-    );
+    const fileInfo = await this._exporter.export(version, output, this);
 
     ret.code = 0;
-    ret.msg = 'Atlas success';
+    ret.msg = "Atlas success";
     ret.info = fileInfo;
 
     return ret;

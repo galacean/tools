@@ -30,11 +30,11 @@ export class Exporter {
   }
 
   private async _exportToGalacean(version: string, output: string, packer: MaxRectsPacker) {
-    const res = { atlasItems: <any>[], version: version, format: 1};
+    const res = { atlasItems: <any>[], version: version, format: 1 };
     const imageFile = await this._generatePackedImage(output, packer);
     const item = {
-      "img": `${path.basename(output)}.png`,
-      "sprites": <any>[]
+      img: `${path.basename(output)}.png`,
+      sprites: <any>[]
     };
     res.atlasItems.push(item);
     const { packedRects } = packer;
@@ -42,17 +42,17 @@ export class Exporter {
     for (let i = 0, l = packedRects.length; i < l; ++i) {
       const rect = packedRects[i];
       sprites.push({
-        "name": rect.name,
-        "atlasRotated": rect.isRotated,
-        "atlasRegion": {
-          "x": rect.x,
-          "y": rect.y,
-          "w": rect.width,
-          "h": rect.height
+        name: rect.name,
+        atlasRotated: rect.isRotated,
+        atlasRegion: {
+          x: rect.x,
+          y: rect.y,
+          w: rect.width,
+          h: rect.height
         },
-        "originalSize": {
-          "w": rect.width,
-          "h": rect.height
+        originalSize: {
+          w: rect.width,
+          h: rect.height
         }
       });
     }
@@ -62,8 +62,8 @@ export class Exporter {
       const atlasFile = path.resolve(`${output}.atlas`);
       await fs.writeFileSync(atlasFile, atlasStr);
       return {
-        'imageFile': imageFile,
-        'atlasFile': atlasFile
+        imageFile: imageFile,
+        atlasFile: atlasFile
       };
     } catch (error) {
       throw new Error(`jsonParseErr【${output}】`);

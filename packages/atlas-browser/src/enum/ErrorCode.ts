@@ -4,5 +4,5 @@ export enum ErrorCode {
   ImageLoadError,
   OffscreenBlobError,
   CanvasBlobError,
-  PackError,
+  PackError
 }

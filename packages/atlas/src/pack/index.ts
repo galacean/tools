@@ -1,13 +1,7 @@
 const path = require("path");
 
 import { findAllImageFilesSync } from "../utils";
-import {
-  AlgorithmType,
-  AtlasFormat,
-  MaxRectsMethod,
-  MaxRectsOption,
-  MaxRectsPacker,
-} from "./algorithm";
+import { AlgorithmType, AtlasFormat, MaxRectsMethod, MaxRectsOption, MaxRectsPacker } from "./algorithm";
 
 const version = `__buildVersion`;
 console.log(`atlas tool version: ${version}`);
@@ -21,12 +15,12 @@ export async function pack(imageFiles: Array<string>, cliOptions: any) {
       return await packWithMaxRects(version, realImageFiles, {
         width: cliOptions.maxWidth || 1024,
         height: cliOptions.maxHeight || 1024,
-        padding: typeof cliOptions.padding === 'undefined' ? 1 : cliOptions.padding,
+        padding: typeof cliOptions.padding === "undefined" ? 1 : cliOptions.padding,
         allowRotate: cliOptions.allowRotate || false,
         square: cliOptions.square || false,
         pot: cliOptions.pot || false,
-        format: getAtlasFormat(cliOptions.format || 'galacean'),
-        output: cliOptions.output || 'galacean',
+        format: getAtlasFormat(cliOptions.format || "galacean"),
+        output: cliOptions.output || "galacean",
         editorExtras: cliOptions.editorExtras || []
       });
     case AlgorithmType.Polygon:
@@ -55,11 +49,7 @@ function getAtlasFormat(format: string): AtlasFormat {
 }
 
 const nameSet = new Set();
-async function packWithMaxRects(
-  version: string,
-  imageFiles: Array<string>,
-  option: MaxRectsOption
-) {
+async function packWithMaxRects(version: string, imageFiles: Array<string>, option: MaxRectsOption) {
   const pack = new MaxRectsPacker(option);
   try {
     const names: Array<string> = [];
@@ -71,32 +61,31 @@ async function packWithMaxRects(
       if (extras.length !== imageFiles.length) {
         return {
           code: 4,
-          msg: 'Inconsistent with the number of images'
-        }
+          msg: "Inconsistent with the number of images"
+        };
       }
       hasExtras = true;
     }
 
     for (let i = 0, l = imageFiles.length; i < l; ++i) {
       const file = imageFiles[i];
-      const name = hasExtras ? extras[i].name || '' : path.basename(file, path.extname(file));
+      const name = hasExtras ? extras[i].name || "" : path.basename(file, path.extname(file));
       if (nameSet.has(name)) {
         return {
           code: 5,
           msg: `There is a image with the same name: ${name}`
-        }
+        };
       }
       nameSet.add(name);
       names[i] = name;
     }
     await pack.addImages(imageFiles, names);
-  } catch(error) {
+  } catch (error) {
     return {
       code: 3,
-      msg: 'Read image error'
-    }
+      msg: "Read image error"
+    };
   }
   pack.pack(MaxRectsMethod.BestLongSideFit);
   return await pack.export(version, option.output);
 }
-

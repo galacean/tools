@@ -50,48 +50,19 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
     switch (logic) {
       case MaxRectsMethod.BestShortSideFit:
-        newNode = this._findPositionForNewNodeBestShortSideFit(
-          width,
-          height,
-          score1,
-          score2,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBestShortSideFit(width, height, score1, score2, allowRotate);
         break;
       case MaxRectsMethod.BottomLeftRule:
-        newNode = this._findPositionForNewNodeBottomLeft(
-          width,
-          height,
-          score1,
-          score2,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBottomLeft(width, height, score1, score2, allowRotate);
         break;
       case MaxRectsMethod.ContactPointRule:
-        newNode = this._findPositionForNewNodeContactPoint(
-          width,
-          height,
-          score1,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeContactPoint(width, height, score1, allowRotate);
         break;
       case MaxRectsMethod.BestLongSideFit:
-        newNode = this._findPositionForNewNodeBestLongSideFit(
-          width,
-          height,
-          score2,
-          score1,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBestLongSideFit(width, height, score2, score1, allowRotate);
         break;
       case MaxRectsMethod.BestAreaFit:
-        newNode = this._findPositionForNewNodeBestAreaFit(
-          width,
-          height,
-          score1,
-          score2,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBestAreaFit(width, height, score1, score2, allowRotate);
         break;
       default:
         break;
@@ -125,19 +96,9 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
         const score1 = { value: 0 };
         const score2 = { value: 0 };
-        const newNode = this._scoreRectangle(
-          rect.width,
-          rect.height,
-          logic,
-          score1,
-          score2,
-          allowRotate
-        );
+        const newNode = this._scoreRectangle(rect.width, rect.height, logic, score1, score2, allowRotate);
 
-        if (
-          score1.value < bestScore1 ||
-          (score1.value === bestScore1 && score2.value < bestScore2)
-        ) {
+        if (score1.value < bestScore1 || (score1.value === bestScore1 && score2.value < bestScore2)) {
           bestScore1 = score1.value;
           bestScore2 = score2.value;
           bestNode = newNode;
@@ -200,49 +161,20 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
     switch (method) {
       case MaxRectsMethod.BestShortSideFit:
-        newNode = this._findPositionForNewNodeBestShortSideFit(
-          width,
-          height,
-          score1,
-          score2,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBestShortSideFit(width, height, score1, score2, allowRotate);
         break;
       case MaxRectsMethod.BottomLeftRule:
-        newNode = this._findPositionForNewNodeBottomLeft(
-          width,
-          height,
-          score1,
-          score2,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBottomLeft(width, height, score1, score2, allowRotate);
         break;
       case MaxRectsMethod.ContactPointRule:
-        newNode = this._findPositionForNewNodeContactPoint(
-          width,
-          height,
-          score1,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeContactPoint(width, height, score1, allowRotate);
         score1.value = -score1.value;
         break;
       case MaxRectsMethod.BestLongSideFit:
-        newNode = this._findPositionForNewNodeBestLongSideFit(
-          width,
-          height,
-          score2,
-          score1,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBestLongSideFit(width, height, score2, score1, allowRotate);
         break;
       case MaxRectsMethod.BestAreaFit:
-        newNode = this._findPositionForNewNodeBestAreaFit(
-          width,
-          height,
-          score1,
-          score2,
-          allowRotate
-        );
+        newNode = this._findPositionForNewNodeBestAreaFit(width, height, score1, score2, allowRotate);
         break;
       default:
         break;
@@ -273,10 +205,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
       rect = freeRectangles[i];
       if (rect.width >= width && rect.height >= height) {
         topSideY = rect.y + height;
-        if (
-          topSideY < bestY.value ||
-          (topSideY === bestY.value && rect.x < bestX.value)
-        ) {
+        if (topSideY < bestY.value || (topSideY === bestY.value && rect.x < bestX.value)) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
           bestNode.width = width;
@@ -288,10 +217,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
       }
       if (allowRotate && rect.width >= height && rect.height >= width) {
         topSideY = rect.y + width;
-        if (
-          topSideY < bestY.value ||
-          (topSideY === bestY.value && rect.x < bestX.value)
-        ) {
+        if (topSideY < bestY.value || (topSideY === bestY.value && rect.x < bestX.value)) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
           bestNode.width = height;
@@ -333,8 +259,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
         if (
           shortSideFit < bestShortSideFit.value ||
-          (shortSideFit === bestShortSideFit.value &&
-            longSideFit < bestLongSideFit.value)
+          (shortSideFit === bestShortSideFit.value && longSideFit < bestLongSideFit.value)
         ) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
@@ -348,19 +273,12 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
       if (allowRotate && rect.width >= height && rect.height >= width) {
         const flippedLeftoverHoriz = Math.abs(rect.width - height);
         const flippedLeftoverVert = Math.abs(rect.height - width);
-        const flippedShortSideFit = Math.min(
-          flippedLeftoverHoriz,
-          flippedLeftoverVert
-        );
-        const flippedLongSideFit = Math.max(
-          flippedLeftoverHoriz,
-          flippedLeftoverVert
-        );
+        const flippedShortSideFit = Math.min(flippedLeftoverHoriz, flippedLeftoverVert);
+        const flippedLongSideFit = Math.max(flippedLeftoverHoriz, flippedLeftoverVert);
 
         if (
           flippedShortSideFit < bestShortSideFit.value ||
-          (flippedShortSideFit === bestShortSideFit.value &&
-            flippedLongSideFit < bestLongSideFit.value)
+          (flippedShortSideFit === bestShortSideFit.value && flippedLongSideFit < bestLongSideFit.value)
         ) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
@@ -402,8 +320,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
         if (
           longSideFit < bestLongSideFit.value ||
-          (longSideFit === bestLongSideFit.value &&
-            shortSideFit < bestShortSideFit.value)
+          (longSideFit === bestLongSideFit.value && shortSideFit < bestShortSideFit.value)
         ) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
@@ -423,8 +340,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
         if (
           longSideFit < bestLongSideFit.value ||
-          (longSideFit === bestLongSideFit.value &&
-            shortSideFit < bestShortSideFit.value)
+          (longSideFit === bestLongSideFit.value && shortSideFit < bestShortSideFit.value)
         ) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
@@ -466,11 +382,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
         leftoverVert = Math.abs(rect.height - height);
         shortSideFit = Math.min(leftoverHoriz, leftoverVert);
 
-        if (
-          areaFit < bestAreaFit.value ||
-          (areaFit === bestAreaFit.value &&
-            shortSideFit < bestShortSideFit.value)
-        ) {
+        if (areaFit < bestAreaFit.value || (areaFit === bestAreaFit.value && shortSideFit < bestShortSideFit.value)) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
           bestNode.width = width;
@@ -486,11 +398,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
         leftoverVert = Math.abs(rect.height - width);
         shortSideFit = Math.min(leftoverHoriz, leftoverVert);
 
-        if (
-          areaFit < bestAreaFit.value ||
-          (areaFit === bestAreaFit.value &&
-            shortSideFit < bestShortSideFit.value)
-        ) {
+        if (areaFit < bestAreaFit.value || (areaFit === bestAreaFit.value && shortSideFit < bestShortSideFit.value)) {
           bestNode.x = rect.x;
           bestNode.y = rect.y;
           bestNode.width = height;
@@ -504,24 +412,14 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
     return bestNode;
   }
 
-  private _commonIntervalLength(
-    i1start: number,
-    i1end: number,
-    i2start: number,
-    i2end: number
-  ) {
+  private _commonIntervalLength(i1start: number, i1end: number, i2start: number, i2end: number) {
     if (i1end < i2start || i2end < i1start) {
       return 0;
     }
     return Math.min(i1end, i2end) - Math.max(i1start, i2start);
   }
 
-  private _contactPointScoreNode(
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ) {
+  private _contactPointScoreNode(x: number, y: number, width: number, height: number) {
     const usedRectangles = this.usedRectangles;
     let score = 0;
 
@@ -531,19 +429,9 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
     for (let i = 0; i < usedRectangles.length; i++) {
       rect = usedRectangles[i];
       if (rect.x === x + width || rect.x + rect.width === x)
-        score += this._commonIntervalLength(
-          rect.y,
-          rect.y + rect.height,
-          y,
-          y + height
-        );
+        score += this._commonIntervalLength(rect.y, rect.y + rect.height, y, y + height);
       if (rect.y === y + height || rect.y + rect.height === y)
-        score += this._commonIntervalLength(
-          rect.x,
-          rect.x + rect.width,
-          x,
-          x + width
-        );
+        score += this._commonIntervalLength(rect.x, rect.x + rect.width, x, x + width);
     }
     return score;
   }
@@ -600,14 +488,8 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
       return false;
 
     let newNode;
-    if (
-      usedNode.x < freeNode.x + freeNode.width &&
-      usedNode.x + usedNode.width > freeNode.x
-    ) {
-      if (
-        usedNode.y > freeNode.y &&
-        usedNode.y < freeNode.y + freeNode.height
-      ) {
+    if (usedNode.x < freeNode.x + freeNode.width && usedNode.x + usedNode.width > freeNode.x) {
+      if (usedNode.y > freeNode.y && usedNode.y < freeNode.y + freeNode.height) {
         newNode = freeNode.clone();
         newNode.height = usedNode.y - newNode.y;
         if (newNode.width > 0 && newNode.height > 0) {
@@ -618,18 +500,14 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
       if (usedNode.y + usedNode.height < freeNode.y + freeNode.height) {
         newNode = freeNode.clone();
         newNode.y = usedNode.y + usedNode.height;
-        newNode.height =
-          freeNode.y + freeNode.height - (usedNode.y + usedNode.height);
+        newNode.height = freeNode.y + freeNode.height - (usedNode.y + usedNode.height);
         if (newNode.width > 0 && newNode.height > 0) {
           freeRectangles.push(newNode);
         }
       }
     }
 
-    if (
-      usedNode.y < freeNode.y + freeNode.height &&
-      usedNode.y + usedNode.height > freeNode.y
-    ) {
+    if (usedNode.y < freeNode.y + freeNode.height && usedNode.y + usedNode.height > freeNode.y) {
       if (usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.width) {
         newNode = freeNode.clone();
         newNode.width = usedNode.x - newNode.x;
@@ -641,8 +519,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
       if (usedNode.x + usedNode.width < freeNode.x + freeNode.width) {
         newNode = freeNode.clone();
         newNode.x = usedNode.x + usedNode.width;
-        newNode.width =
-          freeNode.x + freeNode.width - (usedNode.x + usedNode.width);
+        newNode.width = freeNode.x + freeNode.width - (usedNode.x + usedNode.width);
         if (newNode.width > 0 && newNode.height > 0) {
           freeRectangles.push(newNode);
         }
@@ -687,16 +564,14 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
 
   private _canFit(width: number, height: number, allowRotate: boolean) {
     if (width <= this.binWidth && height <= this.binHeight) return true;
-    if (allowRotate && height <= this.binWidth && width <= this.binHeight)
-      return true;
+    if (allowRotate && height <= this.binWidth && width <= this.binHeight) return true;
     return false;
   }
 
   private _getAllowRotate(rect: Rect) {
     const anyRect = rect as any;
     if (typeof anyRect.allowRotate === "boolean") return anyRect.allowRotate;
-    if (typeof anyRect.allowRotation === "boolean")
-      return anyRect.allowRotation;
+    if (typeof anyRect.allowRotation === "boolean") return anyRect.allowRotation;
     return this.allowRotate;
   }
 

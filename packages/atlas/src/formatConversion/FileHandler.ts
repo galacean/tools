@@ -7,11 +7,7 @@ const path = require("path");
  * @param oneHandler 单个文件读取完毕后执行的函数 会传入参数 “路径”
  * @param callBack 所有文件读取完毕后执行的函数
  */
-export function walkDir(
-  dirPath: string,
-  oneHandler: Function,
-  cbHandler: Function
-) {
+export function walkDir(dirPath: string, oneHandler: Function, cbHandler: Function) {
   // 总文件数
   let fileNum = 0;
   const counter = (num: number) => {
