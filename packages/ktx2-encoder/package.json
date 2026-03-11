@@ -1,0 +1,34 @@
+{
+  "name": "@galacean/tools-ktx2-encoder",
+  "version": "1.5.0-alpha.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "main": "dist/main.js",
+    "module": "dist/module.js",
+    "browser": "dist/browser.js",
+    "types": "types/index.d.ts"
+  },
+  "homepage": "https://oasisengine.cn/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/galacean/tools"
+  },
+  "bugs": "https://github.com/galacean/tools/issues",
+  "scripts": {
+    "b:types": "tsc",
+    "lint:fix": "tslint --fix --project ./tsconfig.json"
+  },
+  "types": "src/index.ts",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "browser": "src/index.ts",
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "dependencies": {
+    "ktx-parse": "^0.7.1"
+  }
+}

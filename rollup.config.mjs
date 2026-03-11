@@ -86,13 +86,21 @@ function makeRollupConfig(pkg) {
 
   globals["@galacean/engine"] = "Galacean";
 
+  // Use publishConfig paths for build output to avoid overwriting source files.
+  // During development, main/module/browser point to src/index.ts for direct consumption;
+  // publishConfig contains the actual dist output paths used for npm publishing.
+  const publish = pkg.pkgJson.publishConfig || {};
+  const mainOutput = publish.main || pkg.pkgJson.main;
+  const moduleOutput = publish.module || pkg.pkgJson.module;
+  const browserOutput = publish.browser || pkg.pkgJson.browser;
+
   const config = [];
   const input = path.join(pkg.location, "src", pkg.pkgJson.types ? "index.ts" : "index.js");
-  if (pkg.pkgJson.main) {
+  if (mainOutput) {
     config.push({
       input,
       output: {
-        file: path.join(pkg.location, pkg.pkgJson.main),
+        file: path.join(pkg.location, mainOutput),
         format: "commonjs",
         sourcemap: true
       },
@@ -100,11 +108,11 @@ function makeRollupConfig(pkg) {
       plugins
     });
   }
-  if (pkg.pkgJson.module) {
+  if (moduleOutput) {
     config.push({
       input,
       output: {
-        file: path.join(pkg.location, pkg.pkgJson.module),
+        file: path.join(pkg.location, moduleOutput),
         format: "es",
         sourcemap: true
       },
@@ -112,11 +120,11 @@ function makeRollupConfig(pkg) {
       plugins
     });
   }
-  if (pkg.pkgJson.browser) {
+  if (browserOutput) {
     config.push({
       input,
       output: {
-        file: path.join(pkg.location, pkg.pkgJson.browser),
+        file: path.join(pkg.location, browserOutput),
         format: "umd",
         name: toGlobalName(pkg.pkgJson.name),
         globals: globals
