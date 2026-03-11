@@ -16,7 +16,12 @@ class BrowserBasisEncoder {
         const jsUrl = options?.jsUrl ?? "../basis/basis_encoder.js";
         return new Promise((resolve, reject) => {
           Promise.all([
-            import(/* @vite-ignore */ jsUrl),
+            fetch(jsUrl)
+              .then((res) => res.text())
+              .then((code) => {
+                const blob = new Blob([code], { type: "application/javascript" });
+                return import(/* @vite-ignore */ URL.createObjectURL(blob));
+              }),
             wasmUrl ? fetch(wasmUrl).then((res) => res.arrayBuffer()) : undefined
           ])
             .then(([{ default: BASIS }, wasmBinary]) => {
