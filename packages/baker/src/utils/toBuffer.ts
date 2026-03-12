@@ -3,7 +3,8 @@ import { SphericalHarmonics3, TextureCubeFace, TextureCube } from "@galacean/eng
 const FILE_HEADER_MAGIC = 0x4e434c47; // "GLCN" in little-endian
 const FILE_TYPE = "AmbientLight";
 const FILE_TYPE_BYTES = new TextEncoder().encode(FILE_TYPE);
-const FILE_HEADER_LENGTH = 4 + 4 + 1 + 2 + FILE_TYPE_BYTES.length + 2;
+// Align to 4 bytes so data can be accessed via TypedArray views
+const FILE_HEADER_LENGTH = ((4 + 4 + 1 + 2 + FILE_TYPE_BYTES.length + 2) + 3) & ~3;
 
 /**
  * Write standard Galacean FileHeader into a DataView.
