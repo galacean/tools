@@ -81,7 +81,7 @@ class BrowserBasisEncoder {
           if (options.isHDR) {
             encoder.setSliceSourceImageHDR(
               sliceIndex, faces[face], mipWidth, mipHeight,
-              options.imageType, true
+              (options as any).imageType, true
             );
           } else {
             encoder.setSliceSourceImage(
@@ -93,11 +93,13 @@ class BrowserBasisEncoder {
       }
     } else {
       // Single image or 6-face cubemap (base level only)
-      const bufferArray = Array.isArray(bufferOrBufferArray) ? bufferOrBufferArray : [bufferOrBufferArray];
+      const bufferArray: Uint8Array[] = Array.isArray(bufferOrBufferArray)
+        ? (bufferOrBufferArray as Uint8Array[])
+        : [bufferOrBufferArray as Uint8Array];
       for (let i = 0; i < bufferArray.length; i++) {
         const buffer = bufferArray[i];
         if (options.isHDR) {
-          const imageType = options.imageType;
+          const imageType = (options as any).imageType as HDRSourceType;
           const isRaster = imageType === HDRSourceType.RGBAHalfFloat || imageType === HDRSourceType.RGBAFloat;
           encoder.setSliceSourceImageHDR(
             i, buffer,

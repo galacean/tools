@@ -188,14 +188,6 @@ interface HDROptions extends BasisOptions {
    * HDR quality level (0-4), default is 1. Higher = slower but better quality.
    */
   hdrQualityLevel?: number;
-  /**
-   * Image width in pixels. Required for raster types (RGBAHalfFloat/RGBAFloat).
-   */
-  width?: number;
-  /**
-   * Image height in pixels. Required for raster types (RGBAHalfFloat/RGBAFloat).
-   */
-  height?: number;
 }
 interface LDROptions extends BasisOptions {
   /**
@@ -206,6 +198,14 @@ interface LDROptions extends BasisOptions {
 }
 
 interface BasisOptions {
+  /**
+   * Image width in pixels. Required for raster HDR types and multi-mip cubemaps.
+   */
+  width?: number;
+  /**
+   * Image height in pixels. Required for raster HDR types and multi-mip cubemaps.
+   */
+  height?: number;
   /**
    *  enable debug output, default is false
    */
