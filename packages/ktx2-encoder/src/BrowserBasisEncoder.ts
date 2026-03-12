@@ -68,13 +68,13 @@ class BrowserBasisEncoder {
     for (let i = 0; i < bufferArray.length; i++) {
       const buffer = bufferArray[i];
       if (options.isHDR) {
+        const imageType = options.imageType;
+        const isRaster = imageType === HDRSourceType.RGBAHalfFloat || imageType === HDRSourceType.RGBAFloat;
         encoder.setSliceSourceImageHDR(
-          i,
-          buffer,
-          0,
-          0,
-          options.imageType === "hdr" ? HDRSourceType.HDR : HDRSourceType.EXR,
-          true
+          i, buffer,
+          isRaster ? options.width! : 0,
+          isRaster ? options.height! : 0,
+          imageType, true
         );
       } else {
         const imageData = await options.imageDecoder!(buffer);

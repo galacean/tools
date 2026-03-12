@@ -173,13 +173,23 @@ interface HDROptions extends BasisOptions {
    */
   isHDR: true;
   /**
-   * Image type
+   * HDR image type, maps to BasisU hdr_image_type.
+   * For file inputs (EXR/HDR), width/height are ignored.
+   * For raster inputs (RGBAHalfFloat/RGBAFloat), width/height are required.
    */
-  imageType: "hdr" | "exr" | "raster";
+  imageType: HDRSourceType;
   /**
-   * HDR quality level
+   * HDR quality level (0-4), default is 1. Higher = slower but better quality.
    */
   hdrQualityLevel?: number;
+  /**
+   * Image width in pixels. Required for raster types (RGBAHalfFloat/RGBAFloat).
+   */
+  width?: number;
+  /**
+   * Image height in pixels. Required for raster types (RGBAHalfFloat/RGBAFloat).
+   */
+  height?: number;
 }
 interface LDROptions extends BasisOptions {
   /**
