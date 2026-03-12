@@ -1,5 +1,5 @@
 import { read, write } from "ktx-parse";
-import { CubeBufferData, IBasisModule, IEncodeOptions } from "./type";
+import { CubeBufferData, CubeMipmapBufferData, IBasisModule, IEncodeOptions } from "./type";
 import { applyInputOptions } from "./applyInputOptions";
 import { BasisTextureType, HDRSourceType, SourceType } from "./enum";
 
@@ -40,51 +40,81 @@ class BrowserBasisEncoder {
 
   /**
    * encode image data to ktx2 file data
-   * @param bufferOrBufferArray - image data, can be a single image or an array of images
-   * if it's an array, the images will be encoded as a cube map, the order of the images is:
-   *  0: Positive X face
-   *  1: Negative X face
-   *  2: Positive Y face
-   *  3: Negative Y face
-   *  4: Positive Z face
-   *  5: Negative Z face
+   * @param bufferOrBufferArray - image data, can be:
+   *  - Uint8Array: single 2D image
+   *  - CubeBufferData (6-element array): cubemap with 6 faces (base level only, auto-generates mipmaps)
+   *  - CubeMipmapBufferData (nested array): cubemap with pre-computed mipmaps per face.
+   *    Outer array is mip levels, inner array is 6 faces. Auto mipmap generation is disabled.
+   *    Face order per mip level:
+   *      0: Positive X, 1: Negative X, 2: Positive Y, 3: Negative Y, 4: Positive Z, 5: Negative Z
    * @param options - encode options, see {@link IEncodeOptions}
    * @returns ktx2 file data
    */
   async encode(
-    bufferOrBufferArray: Uint8Array | CubeBufferData,
+    bufferOrBufferArray: Uint8Array | CubeBufferData | CubeMipmapBufferData,
     options: Partial<IEncodeOptions> = {}
   ): Promise<Uint8Array> {
     const basisModule = await this.init(options);
     const encoder = new basisModule.BasisEncoder();
+    const isCubeMipmap = Array.isArray(bufferOrBufferArray) && Array.isArray(bufferOrBufferArray[0]);
+    const isCube = isCubeMipmap || (Array.isArray(bufferOrBufferArray) && bufferOrBufferArray.length === 6);
+
+    if (isCubeMipmap) {
+      // Pre-computed mipmaps: disable auto mip generation
+      options = { ...options, generateMipmap: false };
+    }
+
     applyInputOptions(options, encoder);
-    const isCube = Array.isArray(bufferOrBufferArray) && bufferOrBufferArray.length === 6;
     encoder.setTexType(
       isCube ? BasisTextureType.cBASISTexTypeCubemapArray : BasisTextureType.cBASISTexType2D
     );
 
-    const bufferArray = Array.isArray(bufferOrBufferArray) ? bufferOrBufferArray : [bufferOrBufferArray];
-
-    for (let i = 0; i < bufferArray.length; i++) {
-      const buffer = bufferArray[i];
-      if (options.isHDR) {
-        const imageType = options.imageType;
-        const isRaster = imageType === HDRSourceType.RGBAHalfFloat || imageType === HDRSourceType.RGBAFloat;
-        encoder.setSliceSourceImageHDR(
-          i, buffer,
-          isRaster ? options.width! : 0,
-          isRaster ? options.height! : 0,
-          imageType, true
-        );
-      } else {
-        const imageData = await options.imageDecoder!(buffer);
-        encoder.setSliceSourceImage(
-          i,
-          new Uint8Array(imageData.data),
-          imageData.width,
-          imageData.height,
-          SourceType.RAW
-        );
+    if (isCubeMipmap) {
+      // Multi-mip cubemap: bufferOrBufferArray[mipLevel][faceIndex]
+      const mipLevels = bufferOrBufferArray as CubeMipmapBufferData;
+      let sliceIndex = 0;
+      for (let mip = 0; mip < mipLevels.length; mip++) {
+        const faces = mipLevels[mip];
+        const mipWidth = options.width! >> mip;
+        const mipHeight = options.height! >> mip;
+        for (let face = 0; face < faces.length; face++) {
+          if (options.isHDR) {
+            encoder.setSliceSourceImageHDR(
+              sliceIndex, faces[face], mipWidth, mipHeight,
+              options.imageType, true
+            );
+          } else {
+            encoder.setSliceSourceImage(
+              sliceIndex, faces[face], mipWidth, mipHeight, SourceType.RAW
+            );
+          }
+          sliceIndex++;
+        }
+      }
+    } else {
+      // Single image or 6-face cubemap (base level only)
+      const bufferArray = Array.isArray(bufferOrBufferArray) ? bufferOrBufferArray : [bufferOrBufferArray];
+      for (let i = 0; i < bufferArray.length; i++) {
+        const buffer = bufferArray[i];
+        if (options.isHDR) {
+          const imageType = options.imageType;
+          const isRaster = imageType === HDRSourceType.RGBAHalfFloat || imageType === HDRSourceType.RGBAFloat;
+          encoder.setSliceSourceImageHDR(
+            i, buffer,
+            isRaster ? options.width! : 0,
+            isRaster ? options.height! : 0,
+            imageType, true
+          );
+        } else {
+          const imageData = await options.imageDecoder!(buffer);
+          encoder.setSliceSourceImage(
+            i,
+            new Uint8Array(imageData.data),
+            imageData.width,
+            imageData.height,
+            SourceType.RAW
+          );
+        }
       }
     }
 
