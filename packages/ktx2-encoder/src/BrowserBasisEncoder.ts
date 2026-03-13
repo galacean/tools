@@ -60,8 +60,10 @@ class BrowserBasisEncoder {
     const isCube = isCubeMipmap || (Array.isArray(bufferOrBufferArray) && bufferOrBufferArray.length === 6);
 
     if (isCubeMipmap) {
-      // Pre-computed mipmaps: disable auto mip generation
-      options = { ...options, generateMipmap: false };
+      // Basis encoder requires all slices to have the same resolution.
+      // Encode each mip level as a separate cubemap, then merge into one KTX2 container.
+      encoder.delete();
+      return this._encodeCubeMipmap(basisModule, bufferOrBufferArray as CubeMipmapBufferData, options);
     }
 
     applyInputOptions(options, encoder);
@@ -69,29 +71,7 @@ class BrowserBasisEncoder {
       isCube ? BasisTextureType.cBASISTexTypeCubemapArray : BasisTextureType.cBASISTexType2D
     );
 
-    if (isCubeMipmap) {
-      // Multi-mip cubemap: bufferOrBufferArray[mipLevel][faceIndex]
-      const mipLevels = bufferOrBufferArray as CubeMipmapBufferData;
-      let sliceIndex = 0;
-      for (let mip = 0; mip < mipLevels.length; mip++) {
-        const faces = mipLevels[mip];
-        const mipWidth = options.width! >> mip;
-        const mipHeight = options.height! >> mip;
-        for (let face = 0; face < faces.length; face++) {
-          if (options.isHDR) {
-            encoder.setSliceSourceImageHDR(
-              sliceIndex, faces[face], mipWidth, mipHeight,
-              (options as any).imageType, true
-            );
-          } else {
-            encoder.setSliceSourceImage(
-              sliceIndex, faces[face], mipWidth, mipHeight, SourceType.RAW
-            );
-          }
-          sliceIndex++;
-        }
-      }
-    } else {
+    {
       // Single image or 6-face cubemap (base level only)
       const bufferArray: Uint8Array[] = Array.isArray(bufferOrBufferArray)
         ? (bufferOrBufferArray as Uint8Array[])
@@ -134,6 +114,68 @@ class BrowserBasisEncoder {
       actualKTX2FileData = write(container, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
     }
     return actualKTX2FileData;
+  }
+
+  /**
+   * Encode a cubemap with pre-computed mipmaps by encoding each mip level separately,
+   * then merging the per-level KTX2 data into a single KTX2 container.
+   */
+  private async _encodeCubeMipmap(
+    basisModule: IBasisModule,
+    mipLevels: CubeMipmapBufferData,
+    options: Partial<IEncodeOptions>
+  ): Promise<Uint8Array> {
+    const mipOptions: Partial<IEncodeOptions> = { ...options, generateMipmap: false };
+    const baseWidth = options.width!;
+    const baseHeight = options.height!;
+
+    // Encode each mip level as an independent cubemap
+    let baseContainer: ReturnType<typeof read> | null = null;
+    for (let mip = 0; mip < mipLevels.length; mip++) {
+      const faces = mipLevels[mip];
+      const mipWidth = baseWidth >> mip;
+      const mipHeight = baseHeight >> mip;
+
+      const encoder = new basisModule.BasisEncoder();
+      applyInputOptions(mipOptions, encoder);
+      encoder.setTexType(BasisTextureType.cBASISTexTypeCubemapArray);
+
+      for (let face = 0; face < faces.length; face++) {
+        if (options.isHDR) {
+          encoder.setSliceSourceImageHDR(
+            face, faces[face], mipWidth, mipHeight,
+            (options as any).imageType, true
+          );
+        } else {
+          encoder.setSliceSourceImage(
+            face, faces[face], mipWidth, mipHeight, SourceType.RAW
+          );
+        }
+      }
+
+      const ktx2FileData = new Uint8Array(1024 * 1024 * (options.isHDR ? 24 : 10));
+      const byteLength = encoder.encode(ktx2FileData);
+      encoder.delete();
+      if (byteLength === 0) {
+        throw new Error(`Encode failed at mip level ${mip}`);
+      }
+
+      const mipContainer = read(new Uint8Array(ktx2FileData.buffer as ArrayBuffer, 0, byteLength));
+      if (mip === 0) {
+        baseContainer = mipContainer;
+      } else {
+        // Append this mip level's data to the base container
+        baseContainer!.levels.push(mipContainer.levels[0]);
+      }
+    }
+
+    if (options.kvData) {
+      for (const k in options.kvData) {
+        baseContainer!.keyValue[k] = options.kvData[k];
+      }
+    }
+
+    return write(baseContainer!, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
   }
 }
 
