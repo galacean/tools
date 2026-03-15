@@ -1,5 +1,5 @@
 {
-  "name": "@galacean/tools-color-dilation",
+  "name": "@galacean/tools-ktx2-encoder",
   "version": "1.5.0-alpha.0",
   "license": "MIT",
   "publishConfig": {
@@ -27,5 +27,8 @@
   "files": [
     "dist/**/*",
     "types/**/*"
-  ]
+  ],
+  "dependencies": {
+    "ktx-parse": "^0.7.1"
+  }
 }

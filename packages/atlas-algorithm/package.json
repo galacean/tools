@@ -8,12 +8,16 @@
     "test": "../../node_modules/.bin/cross-env TS_NODE_PROJECT=./tests/tsconfig.json node -r ts-node/register tests/index.ts"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "main": "dist/main.js",
+    "module": "dist/module.js",
+    "browser": "dist/browser.js",
+    "types": "types/index.d.ts"
   },
-  "types": "types/index.d.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "browser": "dist/browser.js",
+  "types": "src/index.ts",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "browser": "src/index.ts",
   "author": "",
   "license": "ISC",
   "files": [

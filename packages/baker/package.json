@@ -4,7 +4,11 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "main": "dist/main.js",
+    "module": "dist/module.js",
+    "browser": "dist/browser.js",
+    "types": "types/index.d.ts"
   },
   "homepage": "https://oasisengine.cn/",
   "repository": {
@@ -16,10 +20,10 @@
     "b:types": "tsc",
     "lint:fix": "tslint --fix --project ./tsconfig.json"
   },
-  "types": "types/index.d.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "browser": "dist/browser.js",
+  "types": "src/index.ts",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "browser": "src/index.ts",
   "files": [
     "dist/**/*",
     "types/**/*"

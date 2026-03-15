@@ -1,12 +1,11 @@
 import {
-  RGBEToLinear,
-  RGBMToLinear,
   addSH,
   decodeFaceSH,
+  halfToFloat,
   scaleSH,
-  gammaToLinearSpace
+  solidAngle,
+  sphereQuadrantArea
 } from "./SphericalHarmonics3Baker";
-import { DecodeMode } from "./enums/DecodeMode";
 
 // Only open one worker for one task now.
 export class WorkerManager {
@@ -76,28 +75,25 @@ export class WorkerManager {
    * Bake from Cube texture and use WebWorker.
    * @param texture - Cube texture
    * @param out - SH3 for output
-   * @param decodeMode - Mode of decoding texture cube, default DecodeMode.RGBM
    */
   static calculateSHFromTextureCube(
-    dataPX: Uint8Array,
-    dataNX: Uint8Array,
-    dataPY: Uint8Array,
-    dataNY: Uint8Array,
-    dataPZ: Uint8Array,
-    dataNZ: Uint8Array,
-    textureSize: number,
-    decodeMode: DecodeMode
+    dataPX: Uint16Array,
+    dataNX: Uint16Array,
+    dataPY: Uint16Array,
+    dataNY: Uint16Array,
+    dataPZ: Uint16Array,
+    dataNZ: Uint16Array,
+    textureSize: number
   ): Promise<number[]> {
     return new Promise((resolve) => {
       const taskID = this._taskID++;
-      const worker = this.getWorker([RGBEToLinear, RGBMToLinear, gammaToLinearSpace, addSH, scaleSH, decodeFaceSH]);
+      const worker = this.getWorker([halfToFloat, sphereQuadrantArea, solidAngle, addSH, scaleSH, decodeFaceSH]);
       this._callbacks[taskID] = { resolve };
 
       worker.postMessage({
         type: "calculateSHFromTextureCube",
         taskID,
         textureSize,
-        decodeMode,
         dataPX,
         dataNX,
         dataPY,
@@ -116,15 +112,15 @@ export function onmessageInWorker() {
 
     switch (type) {
       case "calculateSHFromTextureCube":
-        const { decodeMode, textureSize, dataPX, dataNX, dataPY, dataNY, dataPZ, dataNZ } = data;
+        const { textureSize, dataPX, dataNX, dataPY, dataNY, dataPZ, dataNZ } = data;
         const sh = new Float32Array(27);
         let solidAngleSum = 0;
-        solidAngleSum = decodeFaceSH(dataPX, 0, decodeMode, textureSize, solidAngleSum, sh);
-        solidAngleSum = decodeFaceSH(dataNX, 1, decodeMode, textureSize, solidAngleSum, sh);
-        solidAngleSum = decodeFaceSH(dataPY, 2, decodeMode, textureSize, solidAngleSum, sh);
-        solidAngleSum = decodeFaceSH(dataNY, 3, decodeMode, textureSize, solidAngleSum, sh);
-        solidAngleSum = decodeFaceSH(dataPZ, 4, decodeMode, textureSize, solidAngleSum, sh);
-        solidAngleSum = decodeFaceSH(dataNZ, 5, decodeMode, textureSize, solidAngleSum, sh);
+        solidAngleSum = decodeFaceSH(dataPX, 0, textureSize, solidAngleSum, sh);
+        solidAngleSum = decodeFaceSH(dataNX, 1, textureSize, solidAngleSum, sh);
+        solidAngleSum = decodeFaceSH(dataPY, 2, textureSize, solidAngleSum, sh);
+        solidAngleSum = decodeFaceSH(dataNY, 3, textureSize, solidAngleSum, sh);
+        solidAngleSum = decodeFaceSH(dataPZ, 4, textureSize, solidAngleSum, sh);
+        solidAngleSum = decodeFaceSH(dataNZ, 5, textureSize, solidAngleSum, sh);
 
         scaleSH(sh, (4 * Math.PI) / solidAngleSum);
 
