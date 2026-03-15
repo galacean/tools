@@ -15,7 +15,7 @@ export function texturePacker2Galacean(fileObjArr: any[]) {
       const key = frameKeys[j];
       const frame = fileObj.frames[key];
       const sprite: any = {
-        name: key,
+        name: key
       };
       const propNames = Object.keys(frame);
       for (let k = 0; k < propNames.length; k++) {
@@ -31,7 +31,7 @@ export function texturePacker2Galacean(fileObjArr: any[]) {
                 x: frame.frame.x,
                 y: frame.frame.y,
                 w: frame.frame.h,
-                h: frame.frame.w,
+                h: frame.frame.w
               };
             } else {
               sprite.atlasRegion = frame.frame;
@@ -47,7 +47,7 @@ export function texturePacker2Galacean(fileObjArr: any[]) {
               x: frame.spriteSourceSize.x,
               y: frame.spriteSourceSize.y,
               z: frame.sourceSize.w - frame.spriteSourceSize.x - frame.frame.w,
-              w: frame.sourceSize.h - frame.spriteSourceSize.y - frame.frame.h,
+              w: frame.sourceSize.h - frame.spriteSourceSize.y - frame.frame.h
             };
             break;
           case "pivot":
@@ -82,9 +82,7 @@ export function texturePacker2Galacean(fileObjArr: any[]) {
       case "ALPHA":
       case "ALPHA_INTENSITY":
       default:
-        console.error(
-          "不支持【" + meta.format + "】这种格式，请检查 mate.format 属性"
-        );
+        console.error("不支持【" + meta.format + "】这种格式，请检查 mate.format 属性");
         res.format = -1;
         break;
     }

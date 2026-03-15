@@ -1,4 +1,4 @@
 export enum AlgorithmType {
-    MaxRects,
-    Polygon
-  }
+  MaxRects,
+  Polygon
+}

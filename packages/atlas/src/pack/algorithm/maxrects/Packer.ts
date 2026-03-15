@@ -3,22 +3,10 @@ import Jimp from "jimp";
 import { Rect } from "../Rect";
 import { MaxRectsMethod } from "../enums/MaxRectsMethod";
 import { AtlasFormat } from "../enums/AtlasFormat";
-import { MaxRectsBinPack } from "./MaxRectsBinPack";
+import { SmartRectsBinPack } from "./SmartRectsBinPack";
 import { Exporter } from "./Exporter";
 
-const POTS = [
-  2048,
-  1024,
-  512,
-  256,
-  128,
-  64,
-  32,
-  16,
-  8,
-  4,
-  2
-];
+const POTS = [2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2];
 
 export interface MaxRectsOption {
   width: number;
@@ -82,11 +70,8 @@ export class MaxRectsPacker {
       }
     }
 
-    this._pack = new MaxRectsBinPack(
-      this._width,
-      this._height,
-      this._allowRotate
-    );
+    this._pack = new SmartRectsBinPack();
+    this._pack.init(this._width, this._height, this._allowRotate);
     this._exporter = new Exporter(option.format);
   }
 
@@ -160,18 +145,14 @@ export class MaxRectsPacker {
 
     if (this._rectsCount !== this.packedRects.length) {
       ret.code = 1;
-      ret.msg = 'Atlas exceeds maximum size';
+      ret.msg = "Atlas exceeds maximum size";
       return ret;
     }
 
-    const fileInfo = await this._exporter.export(
-      version,
-      output,
-      this
-    );
+    const fileInfo = await this._exporter.export(version, output, this);
 
     ret.code = 0;
-    ret.msg = 'Atlas success';
+    ret.msg = "Atlas success";
     ret.info = fileInfo;
 
     return ret;

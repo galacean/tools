@@ -15,13 +15,7 @@ export class Rect {
   }
 
   clone() {
-    return new Rect(
-      this.x,
-      this.y,
-      this.width,
-      this.height,
-      `${this.name}-clone`
-    );
+    return new Rect(this.x, this.y, this.width, this.height, `${this.name}-clone`);
   }
 
   isContainedIn(rect: Rect) {

@@ -18,20 +18,13 @@ export function formatConversion(filePath: string, cmdObj: any) {
       try {
         const resAtlas = texturePacker2Galacean([JSON.parse(fileData.toString())]);
         if (resAtlas) {
-          const outPath = cmdObj.output
-            ? cmdObj.output
-            : path.basename(singlePath).split(".")[0] + "-galacean";
-          fs.writeFileSync(
-            path.join(path.dirname(singlePath), outPath + ".atlas"),
-            JSON.stringify(resAtlas)
-          );
+          const outPath = cmdObj.output ? cmdObj.output : path.basename(singlePath).split(".")[0] + "-galacean";
+          fs.writeFileSync(path.join(path.dirname(singlePath), outPath + ".atlas"), JSON.stringify(resAtlas));
         }
       } catch (error) {
         console.error("jsonParseErr【" + singlePath + "】");
       }
     },
-    () => {
-      
-    }
+    () => {}
   );
 }

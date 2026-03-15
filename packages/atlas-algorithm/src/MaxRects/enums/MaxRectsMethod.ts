@@ -8,5 +8,5 @@ export enum MaxRectsMethod {
   // /< -BL: Does the Tetris placement.
   BottomLeftRule,
   // /< -CP: Choosest the placement where the Rectangle touches other Rectangles as much as possible.
-  ContactPointRule,
+  ContactPointRule
 }

@@ -49,7 +49,8 @@ const plugins = [
       jsc: {
         loose: true,
         externalHelpers: true,
-        target: "es5"
+        target: "es5",
+        baseUrl: process.cwd()
       },
       sourceMaps: true
     })

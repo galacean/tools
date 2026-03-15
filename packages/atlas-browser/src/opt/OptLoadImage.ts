@@ -7,12 +7,9 @@ export class OptLoadImage extends OptHandler {
   parse(context: PackingContext): Promise<ErrorCode> {
     return new Promise<ErrorCode>((resolve, reject) => {
       const { images } = context;
+      const { width: maxWidth, height: maxHeight, allowRotate } = context.option;
       // 第一步：加载所有的图片
       const imagesLength = images.length;
-      if (imagesLength <= 0) {
-        reject(ErrorCode.NoImage);
-        return;
-      }
       const promiseArray: Promise<HTMLImageElement>[] = [];
       for (let i = 0; i < imagesLength; i++) {
         const image = images[i];
@@ -28,7 +25,17 @@ export class OptLoadImage extends OptHandler {
         }
       }
       Promise.all(promiseArray)
-        .then(() => {
+        .then((imgs) => {
+          for (let j = 0, m = imgs.length; j < m; j++) {
+            const img = imgs[j];
+            const canFit =
+              (img.width <= maxWidth && img.height <= maxHeight) ||
+              (!!allowRotate && img.height <= maxWidth && img.width <= maxHeight);
+            if (!canFit) {
+              reject(ErrorCode.PackError);
+              return;
+            }
+          }
           resolve(ErrorCode.Success);
         })
         .catch((error: Error) => {
@@ -47,14 +54,11 @@ export class OptLoadImage extends OptHandler {
         reject(new Error("Failed to load image buffer"));
       };
       img.onload = function () {
-        // Call requestAnimationFrame to avoid iOS's bug.
-        requestAnimationFrame(() => {
-          img.onload = null;
-          img.onerror = null;
-          img.onabort = null;
-          item.image = img;
-          resolve(img);
-        });
+        img.onload = null;
+        img.onerror = null;
+        img.onabort = null;
+        item.image = img;
+        resolve(img);
       };
       img.crossOrigin = "anonymous";
       img.src = URL.createObjectURL(blob);
@@ -68,14 +72,11 @@ export class OptLoadImage extends OptHandler {
         reject(new Error("Failed to load image buffer"));
       };
       img.onload = function () {
-        // Call requestAnimationFrame to avoid iOS's bug.
-        requestAnimationFrame(() => {
-          img.onload = null;
-          img.onerror = null;
-          img.onabort = null;
-          item.image = img;
-          resolve(img);
-        });
+        img.onload = null;
+        img.onerror = null;
+        img.onabort = null;
+        item.image = img;
+        resolve(img);
       };
       img.crossOrigin = "anonymous";
       img.src = item.src as string;
