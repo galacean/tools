@@ -6,8 +6,9 @@ import { type PackingOutput } from "./interface/PackingOutput";
 import { OptDrawing } from "./opt/OptDrawing";
 import { OptLoadImage } from "./opt/OptLoadImage";
 import { OptPacking } from "./opt/OptPacking";
+import { OptTrim } from "./opt/OptTrim";
 
-const packingPipe = [new OptLoadImage(), new OptPacking(), new OptDrawing()];
+const packingPipe = [new OptLoadImage(), new OptTrim(), new OptPacking(), new OptDrawing()];
 const DefaultOption = {
   width: 2048,
   height: 2048,

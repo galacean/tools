@@ -49,12 +49,14 @@ export class OptPacking extends OptHandler {
       if (!image) {
         return ErrorCode.ImageLoadError;
       }
-      if (!this.checkSizeLegality(image.width, image.height, optionWidth, optionHeight, doublePadding, allowRotate)) {
+      const packW = file.trimRect ? file.trimRect.w : image.width;
+      const packH = file.trimRect ? file.trimRect.h : image.height;
+      if (!this.checkSizeLegality(packW, packH, optionWidth, optionHeight, doublePadding, allowRotate)) {
         // 打包失败
         console.log("打包失败，", file.name, "单图尺寸超图集大小");
         return ErrorCode.PackError;
       }
-      rects.push(new Rect(0, 0, image.width + doublePadding, image.height + doublePadding, file.name));
+      rects.push(new Rect(0, 0, packW + doublePadding, packH + doublePadding, file.name));
     }
 
     const bins: PackingBin[] = [];

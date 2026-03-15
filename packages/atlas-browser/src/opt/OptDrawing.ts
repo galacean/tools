@@ -38,28 +38,68 @@ export class OptDrawing extends OptHandler {
           w: rect.width,
           h: rect.height
         };
-        const image = this.getImage(context.images, rect.name);
+        const packingItem = this.getItem(context.images, rect.name);
+        const image = packingItem?.image;
         if (image) {
-          const { width: imgW, height: imgH } = image;
           const sX = rect.x;
           const sY = rect.y;
-          context2D.drawImage(image, 0, 0, imgW, imgH, sX, sY, imgW, imgH);
+          const trim = packingItem.trimRect;
+
+          // Source region: use trim rect if available, otherwise full image.
+          const srcX = trim ? trim.x : 0;
+          const srcY = trim ? trim.y : 0;
+          const srcW = trim ? trim.w : image.width;
+          const srcH = trim ? trim.h : image.height;
+
+          // Write atlasRegionOffset (normalized trim offsets: left, top, right, bottom).
+          if (trim) {
+            const sw = packingItem.sourceWidth ?? image.width;
+            const sh = packingItem.sourceHeight ?? image.height;
+            atlasSprite.atlasRegionOffset = {
+              x: trim.x / sw,
+              y: trim.y / sh,
+              z: (sw - trim.x - trim.w) / sw,
+              w: (sh - trim.y - trim.h) / sh
+            };
+          }
+
+          // If rotated, create a 90° clockwise rotated source; otherwise draw directly.
+          let src: CanvasImageSource;
+          let drawW: number;
+          let drawH: number;
+          if (rect.isRotated) {
+            drawW = srcH;
+            drawH = srcW;
+            const tempCanvas = new OffscreenCanvas(drawW, drawH);
+            const tempCtx = tempCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+            tempCtx.translate(drawW, 0);
+            tempCtx.rotate(Math.PI / 2);
+            tempCtx.drawImage(image, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH);
+            src = tempCanvas;
+          } else {
+            drawW = srcW;
+            drawH = srcH;
+            src = image;
+          }
+
+          if (rect.isRotated) {
+            context2D.drawImage(src, 0, 0, drawW, drawH, sX, sY, drawW, drawH);
+          } else {
+            context2D.drawImage(src, srcX, srcY, drawW, drawH, sX, sY, drawW, drawH);
+          }
 
           // Handle padding pixels.
           if (padding > 0) {
             try {
+              const padSrcX = rect.isRotated ? 0 : srcX;
+              const padSrcY = rect.isRotated ? 0 : srcY;
               for (let i = 1; i <= padding; ++i) {
-                // Set top and bottom.
-                const topY = sY - i;
-                const bottomY = sY + imgH + i - 1;
-                context2D.drawImage(image, 0, 0, imgW, 1, sX, topY, imgW, 1);
-                context2D.drawImage(image, 0, imgH - 1, imgW, 1, sX, bottomY, imgW, 1);
-
-                // Set left and right.
-                const leftX = sX - i;
-                const rightX = sX + imgW + i - 1;
-                context2D.drawImage(image, 0, 0, 1, imgH, leftX, sY, 1, imgH);
-                context2D.drawImage(image, imgW - 1, 0, 1, imgH, rightX, sY, 1, imgH);
+                // Top and bottom.
+                context2D.drawImage(src, padSrcX, padSrcY, drawW, 1, sX, sY - i, drawW, 1);
+                context2D.drawImage(src, padSrcX, padSrcY + drawH - 1, drawW, 1, sX, sY + drawH + i - 1, drawW, 1);
+                // Left and right.
+                context2D.drawImage(src, padSrcX, padSrcY, 1, drawH, sX - i, sY, 1, drawH);
+                context2D.drawImage(src, padSrcX + drawW - 1, padSrcY, 1, drawH, sX + drawW + i - 1, sY, 1, drawH);
               }
             } catch (error) {
               console.error(JSON.stringify(error));
@@ -79,11 +119,10 @@ export class OptDrawing extends OptHandler {
     return ErrorCode.Success;
   }
 
-  private getImage(images: PackingItem[], name: string): HTMLImageElement | null {
+  private getItem(images: PackingItem[], name: string): PackingItem | null {
     for (let i = images.length - 1; i >= 0; i--) {
-      const image = images[i];
-      if (image.name === name) {
-        return image.image;
+      if (images[i].name === name) {
+        return images[i];
       }
     }
     return null;
