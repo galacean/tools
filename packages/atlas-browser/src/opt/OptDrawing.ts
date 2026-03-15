@@ -51,15 +51,16 @@ export class OptDrawing extends OptHandler {
           const srcW = trim ? trim.w : image.width;
           const srcH = trim ? trim.h : image.height;
 
-          // Write atlasRegionOffset (normalized trim offsets: left, top, right, bottom).
+          // Write atlasRegionOffset in pixels (left, top, right, bottom).
+          // The engine loader handles normalization.
           if (trim) {
             const sw = packingItem.sourceWidth ?? image.width;
             const sh = packingItem.sourceHeight ?? image.height;
             atlasSprite.atlasRegionOffset = {
-              x: trim.x / sw,
-              y: trim.y / sh,
-              z: (sw - trim.x - trim.w) / sw,
-              w: (sh - trim.y - trim.h) / sh
+              x: trim.x,
+              y: trim.y,
+              z: sw - trim.x - trim.w,
+              w: sh - trim.y - trim.h
             };
           }
 

@@ -2,9 +2,31 @@ import { ErrorCode } from "../enum/ErrorCode";
 import { PackingContext } from "../interface/PackingContext";
 import { OptHandler } from "./OptHandler";
 
+interface TrimContext {
+  canvas: OffscreenCanvas | HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+}
+
 export class OptTrim extends OptHandler {
-  private _canvas = new OffscreenCanvas(1, 1);
-  private _ctx = this._canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+  private static _trimContext: TrimContext | null = null;
+
+  private static _getTrimContext(): TrimContext {
+    let { _trimContext: trimContext } = OptTrim;
+    if (!trimContext) {
+      let canvas: OffscreenCanvas | HTMLCanvasElement;
+      try {
+        canvas = new OffscreenCanvas(1, 1);
+      } catch {
+        canvas = document.createElement("canvas");
+      }
+      const ctx = canvas.getContext("2d", { willReadFrequently: true }) as
+        | CanvasRenderingContext2D
+        | OffscreenCanvasRenderingContext2D;
+      trimContext = { canvas, ctx };
+      OptTrim._trimContext = trimContext;
+    }
+    return trimContext;
+  }
 
   parse(context: PackingContext): ErrorCode {
     if (!context.option.allowTrim) {
@@ -12,7 +34,7 @@ export class OptTrim extends OptHandler {
     }
 
     const { images } = context;
-    const { _canvas: canvas, _ctx: ctx } = this;
+    const { canvas, ctx } = OptTrim._getTrimContext();
 
     for (let i = 0, n = images.length; i < n; i++) {
       const item = images[i];
