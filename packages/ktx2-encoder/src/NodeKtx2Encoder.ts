@@ -102,9 +102,18 @@ export class NodeKtx2Encoder implements IKtx2Encoder {
     const nodePath = await import("node:path")
 
     // Auto-resolve basis files from package directory
-    const basisDir = nodePath.join(__dirname, "..", "src", "basis")
-    const basisDirAlt = nodePath.join(__dirname, "basis")
-    const dir = nodeFs.existsSync(basisDir) ? basisDir : basisDirAlt
+    // Candidate dirs: source layout, flat dist, esbuild "assets/" copy
+    const candidates = [
+      nodePath.join(__dirname, "..", "src", "basis"),
+      nodePath.join(__dirname, "basis"),
+      nodePath.join(__dirname, "assets"),
+    ]
+    const dir = candidates.find((d) => nodeFs.existsSync(nodePath.join(d, "basis_encoder.js")))
+    if (!dir) {
+      throw new Error(
+        `Cannot find basis_encoder.js. Searched:\n${candidates.map((d) => `  - ${d}`).join("\n")}`
+      )
+    }
     const basisJs = nodeFs.readFileSync(nodePath.join(dir, "basis_encoder.js"), "utf-8")
     const basisWasm = nodeFs.readFileSync(nodePath.join(dir, "basis_encoder.wasm"))
 
