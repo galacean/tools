@@ -68,7 +68,7 @@ export class NodeKtx2Encoder implements IKtx2Encoder {
 
       let result = new Uint8Array(ktx2FileData.buffer as ArrayBuffer, 0, byteLength)
       if (options.kvData) {
-        const container = read(ktx2FileData)
+        const container = read(result)
         for (const k in options.kvData) container.keyValue[k] = options.kvData[k]
         result = write(container, { keepWriter: true }) as Uint8Array<ArrayBuffer>
       }

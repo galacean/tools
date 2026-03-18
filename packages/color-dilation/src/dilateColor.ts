@@ -25,13 +25,15 @@ async function _dilateColorBrowser(
   fileBuffer: ArrayBuffer,
   options: { range: number; alpha: number }
 ): Promise<Blob | null> {
+  const objectUrl = URL.createObjectURL(new Blob([fileBuffer]));
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "*";
     img.onload = () => resolve(img);
     img.onerror = reject;
-    img.src = URL.createObjectURL(new Blob([fileBuffer]));
+    img.src = objectUrl;
   });
+  URL.revokeObjectURL(objectUrl);
 
   const canvas = document.createElement("canvas");
   canvas.width = img.width;

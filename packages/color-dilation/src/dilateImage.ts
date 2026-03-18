@@ -74,7 +74,7 @@ export function dilateImage(
       }
     }
     queue.length = 0;
-    queue.push(...nextLayer);
+    for (let i = 0; i < nextLayer.length; i++) queue.push(nextLayer[i]);
   }
 
   // Set dilated pixels to the target alpha
