@@ -101,7 +101,20 @@ export class NodeKtx2Encoder implements IKtx2Encoder {
     const nodeFs = await import("node:fs")
     const nodePath = await import("node:path")
 
-    const basisDir = nodePath.join(__dirname, "..", "src", "basis")
+    // Resolve basis files: use require.resolve for bundled builds (where __dirname
+    // no longer points to the package source), fall back to __dirname for source/test
+    const candidates: string[] = []
+    try {
+      const pkgDir = nodePath.dirname(require.resolve("@galacean/tools-ktx2-encoder"))
+      candidates.push(nodePath.join(pkgDir, "basis"), nodePath.join(pkgDir, "..", "src", "basis"))
+    } catch {}
+    candidates.push(nodePath.join(__dirname, "..", "src", "basis"), nodePath.join(__dirname, "basis"))
+    const basisDir = candidates.find((d) => nodeFs.existsSync(nodePath.join(d, "basis_encoder.js")))
+    if (!basisDir) {
+      throw new Error(
+        `Cannot find basis_encoder.js. Searched:\n${candidates.map((d) => `  - ${d}`).join("\n")}`
+      )
+    }
     // Strip `export default` which is needed for browser ESM import
     // but incompatible with vm.runInContext (classic script mode)
     const basisJs = nodeFs.readFileSync(nodePath.join(basisDir, "basis_encoder.js"), "utf-8")
