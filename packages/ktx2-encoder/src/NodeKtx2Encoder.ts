@@ -101,21 +101,12 @@ export class NodeKtx2Encoder implements IKtx2Encoder {
     const nodeFs = await import("node:fs")
     const nodePath = await import("node:path")
 
-    // Auto-resolve basis files from package directory
-    // Candidate dirs: source layout, flat dist, esbuild "assets/" copy
-    const candidates = [
-      nodePath.join(__dirname, "..", "src", "basis"),
-      nodePath.join(__dirname, "basis"),
-      nodePath.join(__dirname, "assets"),
-    ]
-    const dir = candidates.find((d) => nodeFs.existsSync(nodePath.join(d, "basis_encoder.js")))
-    if (!dir) {
-      throw new Error(
-        `Cannot find basis_encoder.js. Searched:\n${candidates.map((d) => `  - ${d}`).join("\n")}`
-      )
-    }
-    const basisJs = nodeFs.readFileSync(nodePath.join(dir, "basis_encoder.js"), "utf-8")
-    const basisWasm = nodeFs.readFileSync(nodePath.join(dir, "basis_encoder.wasm"))
+    const basisDir = nodePath.join(__dirname, "..", "src", "basis")
+    // Strip `export default` which is needed for browser ESM import
+    // but incompatible with vm.runInContext (classic script mode)
+    const basisJs = nodeFs.readFileSync(nodePath.join(basisDir, "basis_encoder.js"), "utf-8")
+      .replace(/^\s*export\s+default\s+.+$/m, "")
+    const basisWasm = nodeFs.readFileSync(nodePath.join(basisDir, "basis_encoder.wasm"))
 
     const sandbox = vm.createContext({
       process, Buffer, require, console,
@@ -124,7 +115,7 @@ export class NodeKtx2Encoder implements IKtx2Encoder {
       ArrayBuffer, SharedArrayBuffer, DataView,
       Uint8Array, Uint16Array, Uint32Array, Int8Array, Int16Array, Int32Array,
       Float32Array, Float64Array, Uint8ClampedArray, URL,
-      __dirname: dir, __filename: nodePath.join(dir, "basis_encoder.js"),
+      __dirname: basisDir, __filename: nodePath.join(basisDir, "basis_encoder.js"),
       module: { exports: {} as any }, exports: {} as any,
     })
 

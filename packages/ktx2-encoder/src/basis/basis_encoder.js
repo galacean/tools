@@ -2,14 +2,7 @@
 // compatible with both browser and node.js
 const ENVIRONMENT_IS_NODE=typeof process=="object"&&typeof process.versions=="object"&&typeof 
 process.versions.node=="string";
-if(ENVIRONMENT_IS_NODE){
-  const { createRequire } = await import('module');
-  /** @suppress{duplicate} */
-  var require = createRequire(import.meta.url);
-  const path = require('node:path');
-  const { fileURLToPath } = require('node:url');
-  var __dirname = path.dirname(fileURLToPath(import.meta.url));
-};
+
 function __log(message, ...optionalParams) {
   if(globalThis.DEBUG) {
     console.log(message, ...optionalParams)
