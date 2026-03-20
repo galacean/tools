@@ -108,7 +108,11 @@ export class NodeKtx2Encoder implements IKtx2Encoder {
       const pkgDir = nodePath.dirname(require.resolve("@galacean/tools-ktx2-encoder"))
       candidates.push(nodePath.join(pkgDir, "basis"), nodePath.join(pkgDir, "..", "src", "basis"))
     } catch {}
-    candidates.push(nodePath.join(__dirname, "..", "src", "basis"), nodePath.join(__dirname, "basis"))
+    candidates.push(
+      nodePath.join(__dirname, "..", "src", "basis"),
+      nodePath.join(__dirname, "basis"),
+      nodePath.join(__dirname, "assets"),
+    )
     const basisDir = candidates.find((d) => nodeFs.existsSync(nodePath.join(d, "basis_encoder.js")))
     if (!basisDir) {
       throw new Error(
