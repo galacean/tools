@@ -2,42 +2,73 @@ import { read, write } from "ktx-parse";
 import { CubeBufferData, CubeMipmapBufferData, IBasisModule, IEncodeOptions } from "./type";
 import { applyInputOptions } from "./applyInputOptions";
 import { BasisTextureType, HDRSourceType, SourceType } from "./enum";
-
-let promise: Promise<IBasisModule> | null = null;
+import type { IKtx2Encoder } from "./IKtx2Encoder";
 
 const DEFAULT_WASM_URL =
   "https://mdn.alipayobjects.com/rms/afts/file/A*r7D4SKbksYcAAAAAAAAAAAAAARQnAQ/basis_encoder.wasm";
 
-class BrowserBasisEncoder {
-  async init(options?: { jsUrl?: string; wasmUrl?: string }) {
-    if (!promise) {
-      function _init(): Promise<IBasisModule> {
-        const wasmUrl = options?.wasmUrl ?? DEFAULT_WASM_URL;
-        const jsUrl = options?.jsUrl ?? "../basis/basis_encoder.js";
-        return new Promise((resolve, reject) => {
-          Promise.all([
-            fetch(jsUrl)
-              .then((res) => res.text())
-              .then((code) => {
-                const blob = new Blob([code], { type: "application/javascript" });
-                return import(/* @vite-ignore */ URL.createObjectURL(blob));
-              }),
-            wasmUrl ? fetch(wasmUrl).then((res) => res.arrayBuffer()) : undefined
-          ])
-            .then(([{ default: BASIS }, wasmBinary]) => {
-              return BASIS({ wasmBinary }).then((Module: IBasisModule) => {
-                Module.initializeBasis();
-                resolve(Module);
-              });
-            })
-            .catch(reject);
-        });
-      }
-      promise = _init();
-    }
-    return promise;
-  }
+let modulePromise: Promise<IBasisModule> | null = null;
 
+async function initBrowserModule(options?: Partial<IEncodeOptions>): Promise<IBasisModule> {
+  if (!modulePromise) {
+    modulePromise = (async () => {
+      const wasmUrl = options?.wasmUrl ?? DEFAULT_WASM_URL;
+      const jsUrl = options?.jsUrl ?? "../basis/basis_encoder.js";
+
+      const [{ default: BASIS }, wasmBinary] = await Promise.all([
+        fetch(jsUrl)
+          .then((res) => res.text())
+          .then((code) => {
+            const blob = new Blob([code], { type: "application/javascript" });
+            return import(/* @vite-ignore */ URL.createObjectURL(blob));
+          }),
+        wasmUrl ? fetch(wasmUrl).then((res) => res.arrayBuffer()) : undefined,
+      ]);
+
+      const Module: IBasisModule = await BASIS({ wasmBinary });
+      Module.initializeBasis();
+      return Module;
+    })();
+  }
+  return modulePromise;
+}
+
+async function decodeImageBrowser(buffer: Uint8Array): Promise<{ width: number; height: number; data: Uint8Array }> {
+  const getGlContext = (() => {
+    let gl: WebGL2RenderingContext | null = null;
+    return () => {
+      if (!gl) {
+        const canvas = new OffscreenCanvas(128, 128);
+        gl = canvas.getContext("webgl2", { premultipliedAlpha: false }) as WebGL2RenderingContext;
+      }
+      return gl;
+    };
+  })();
+
+  const gl = getGlContext();
+  const imageBitmap = await createImageBitmap(new Blob([buffer as BlobPart]));
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageBitmap);
+
+  const framebuffer = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+  const { width, height } = imageBitmap;
+  const pixels = new Uint8Array(width * height * 4);
+  gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+  gl.deleteTexture(texture);
+  gl.deleteFramebuffer(framebuffer);
+
+  return { data: pixels, width, height };
+}
+
+/**
+ * Browser KTX2 encoder — self-contained, no global registration needed.
+ */
+class BasisEncoder implements IKtx2Encoder {
   /**
    * encode image data to ktx2 file data
    * @param bufferOrBufferArray - image data, can be:
@@ -54,7 +85,9 @@ class BrowserBasisEncoder {
     bufferOrBufferArray: Uint8Array | CubeBufferData | CubeMipmapBufferData,
     options: Partial<IEncodeOptions> = {}
   ): Promise<Uint8Array> {
-    const basisModule = await this.init(options);
+    const basisModule = await initBrowserModule(options);
+    options.imageDecoder ??= decodeImageBrowser;
+
     const encoder = new basisModule.BasisEncoder();
     const isCubeMipmap = Array.isArray(bufferOrBufferArray) && Array.isArray(bufferOrBufferArray[0]);
     const isCube = isCubeMipmap || (Array.isArray(bufferOrBufferArray) && bufferOrBufferArray.length === 6);
@@ -107,7 +140,7 @@ class BrowserBasisEncoder {
     }
     let actualKTX2FileData = new Uint8Array(ktx2FileData.buffer as ArrayBuffer, 0, byteLength);
     if (options.kvData) {
-      const container = read(ktx2FileData);
+      const container = read(actualKTX2FileData);
       for (let k in options.kvData) {
         container.keyValue[k] = options.kvData[k];
       }
@@ -177,6 +210,20 @@ class BrowserBasisEncoder {
 
     return write(baseContainer!, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
   }
+
+  setTextureParams(
+    buffer: Uint8Array,
+    params: { wrapModeU: number; wrapModeV: number; filterMode: number; anisoLevel: number }
+  ): Uint8Array {
+    const container = read(buffer);
+    container.keyValue["GalaceanTextureParams"] = new Uint8Array([
+      params.wrapModeU,
+      params.wrapModeV,
+      params.filterMode,
+      params.anisoLevel,
+    ]);
+    return write(container);
+  }
 }
 
-export const browserEncoder = new BrowserBasisEncoder();
+export const basisEncoder = new BasisEncoder();
