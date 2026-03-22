@@ -54,11 +54,14 @@ export class OptLoadImage extends OptHandler {
         reject(new Error("Failed to load image buffer"));
       };
       img.onload = function () {
-        img.onload = null;
-        img.onerror = null;
-        img.onabort = null;
-        item.image = img;
-        resolve(img);
+        // Call requestAnimationFrame to avoid iOS's bug.
+        requestAnimationFrame(() => {
+          img.onload = null;
+          img.onerror = null;
+          img.onabort = null;
+          item.image = img;
+          resolve(img);
+        });
       };
       img.crossOrigin = "anonymous";
       img.src = URL.createObjectURL(blob);
@@ -72,11 +75,14 @@ export class OptLoadImage extends OptHandler {
         reject(new Error("Failed to load image buffer"));
       };
       img.onload = function () {
-        img.onload = null;
-        img.onerror = null;
-        img.onabort = null;
-        item.image = img;
-        resolve(img);
+        // Call requestAnimationFrame to avoid iOS's bug.
+        requestAnimationFrame(() => {
+          img.onload = null;
+          img.onerror = null;
+          img.onabort = null;
+          item.image = img;
+          resolve(img);
+        });
       };
       img.crossOrigin = "anonymous";
       img.src = item.src as string;

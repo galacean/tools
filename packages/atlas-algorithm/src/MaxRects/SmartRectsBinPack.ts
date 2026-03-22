@@ -76,6 +76,10 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
     return newNode;
   }
 
+  /**
+   * Insert a set of rectangles.
+   * @remarks Successfully packed rects are spliced out of `rectangles` (mutates the input array).
+   */
   insert2(rectangles: Array<Rect>, method: number) {
     const res: Array<Rect> = [];
     const logic = method || 0;
@@ -98,23 +102,24 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
         const score2 = { value: 0 };
         const newNode = this._scoreRectangle(rect.width, rect.height, logic, score1, score2, allowRotate);
 
+        const sortKey = this._getSortKey(rect, logic);
         if (score1.value < bestScore1 || (score1.value === bestScore1 && score2.value < bestScore2)) {
           bestScore1 = score1.value;
           bestScore2 = score2.value;
           bestNode = newNode;
           bestRectangleIndex = i;
-          bestSortKey = this._getSortKey(rect, logic);
+          bestSortKey = sortKey;
         } else if (
           bestRectangleIndex !== -1 &&
           score1.value !== Infinity &&
           score2.value !== Infinity &&
           score1.value === bestScore1 &&
           score2.value === bestScore2 &&
-          this._getSortKey(rect, logic) > bestSortKey
+          sortKey > bestSortKey
         ) {
           bestNode = newNode;
           bestRectangleIndex = i;
-          bestSortKey = this._getSortKey(rect, logic);
+          bestSortKey = sortKey;
         }
       }
 
@@ -569,9 +574,7 @@ export class SmartRectsBinPack implements IMaxRectsBinPack {
   }
 
   private _getAllowRotate(rect: Rect) {
-    const anyRect = rect as any;
-    if (typeof anyRect.allowRotate === "boolean") return anyRect.allowRotate;
-    if (typeof anyRect.allowRotation === "boolean") return anyRect.allowRotation;
+    if (typeof rect.allowRotate === "boolean") return rect.allowRotate;
     return this.allowRotate;
   }
 

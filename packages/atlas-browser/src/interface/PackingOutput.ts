@@ -1,5 +1,3 @@
-import { Rectangle } from "maxrects-packer";
-
 /**
  * 打包的阶段产物
  */
@@ -17,9 +15,9 @@ export class AtlasConfig {
   filterMode?: number;
   anisoLevel?: number;
   /** Version of Atlas. */
-  version: number;
-  /** Texture format. */
-  format: number;
+  version: number = 0;
+  /** Texture format. 1 = Galacean. */
+  format: number = 1;
   /** The sub atlas array, each sub atlas contains multiple sprites. */
   atlasItems: {
     /** The url of the sub atlas. */
