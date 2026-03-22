@@ -21,8 +21,8 @@ export class OptDrawing extends OptHandler {
       const { rects } = bin;
       const sprites = new Array<AtlasSprite>();
       const atlasItem = {
-        img: `atlas_${i}.png`,
-        type: "image/png",
+        img: "",
+        type: "",
         width: bin.width,
         height: bin.height,
         sprites
