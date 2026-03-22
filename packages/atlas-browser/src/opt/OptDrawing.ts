@@ -43,7 +43,7 @@ export class OptDrawing extends OptHandler {
         if (image) {
           const sX = rect.x;
           const sY = rect.y;
-          const trim = packingItem.trimRect;
+          const trim = context.option.allowTrim ? packingItem.trimRect : undefined;
 
           // Source region: use trim rect if available, otherwise full image.
           const srcX = trim ? trim.x : 0;
