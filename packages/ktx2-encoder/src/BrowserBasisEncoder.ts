@@ -111,7 +111,7 @@ class BrowserBasisEncoder {
       for (let k in options.kvData) {
         container.keyValue[k] = options.kvData[k];
       }
-      actualKTX2FileData = write(container, { keepWriter: true }) as Uint8Array;
+      actualKTX2FileData = write(container, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
     }
     return actualKTX2FileData;
   }
@@ -175,7 +175,7 @@ class BrowserBasisEncoder {
       }
     }
 
-    return write(baseContainer!, { keepWriter: true }) as Uint8Array;
+    return write(baseContainer!, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
   }
 }
 
