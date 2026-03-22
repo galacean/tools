@@ -71,8 +71,15 @@ export class OptDrawing extends OptHandler {
           if (rect.isRotated) {
             drawW = srcH;
             drawH = srcW;
-            const tempCanvas = new OffscreenCanvas(drawW, drawH);
-            const tempCtx = tempCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+            let tempCanvas: OffscreenCanvas | HTMLCanvasElement;
+            try {
+              tempCanvas = new OffscreenCanvas(drawW, drawH);
+            } catch (e) {
+              tempCanvas = document.createElement("canvas");
+              tempCanvas.width = drawW;
+              tempCanvas.height = drawH;
+            }
+            const tempCtx = tempCanvas.getContext("2d") as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
             tempCtx.translate(drawW, 0);
             tempCtx.rotate(Math.PI / 2);
             tempCtx.drawImage(image, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH);

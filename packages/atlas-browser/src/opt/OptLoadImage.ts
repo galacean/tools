@@ -7,7 +7,7 @@ export class OptLoadImage extends OptHandler {
   parse(context: PackingContext): Promise<ErrorCode> {
     return new Promise<ErrorCode>((resolve, reject) => {
       const { images } = context;
-      const { width: maxWidth, height: maxHeight, allowRotate } = context.option;
+      const { width: maxWidth, height: maxHeight, allowRotate, allowTrim } = context.option;
       // 第一步：加载所有的图片
       const imagesLength = images.length;
       const promiseArray: Promise<HTMLImageElement>[] = [];
@@ -26,14 +26,18 @@ export class OptLoadImage extends OptHandler {
       }
       Promise.all(promiseArray)
         .then((imgs) => {
-          for (let j = 0, m = imgs.length; j < m; j++) {
-            const img = imgs[j];
-            const canFit =
-              (img.width <= maxWidth && img.height <= maxHeight) ||
-              (!!allowRotate && img.height <= maxWidth && img.width <= maxHeight);
-            if (!canFit) {
-              reject(ErrorCode.PackError);
-              return;
+          // Skip early size check when allowTrim is enabled,
+          // because OptTrim runs later and may shrink the image to fit.
+          if (!allowTrim) {
+            for (let j = 0, m = imgs.length; j < m; j++) {
+              const img = imgs[j];
+              const canFit =
+                (img.width <= maxWidth && img.height <= maxHeight) ||
+                (!!allowRotate && img.height <= maxWidth && img.width <= maxHeight);
+              if (!canFit) {
+                reject(ErrorCode.PackError);
+                return;
+              }
             }
           }
           resolve(ErrorCode.Success);
