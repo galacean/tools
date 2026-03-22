@@ -49,8 +49,9 @@ export class OptPacking extends OptHandler {
       if (!image) {
         return ErrorCode.ImageLoadError;
       }
-      const packW = file.trimRect ? file.trimRect.w : image.width;
-      const packH = file.trimRect ? file.trimRect.h : image.height;
+      const trim = option.allowTrim ? file.trimRect : undefined;
+      const packW = trim ? trim.w : image.width;
+      const packH = trim ? trim.h : image.height;
       if (!this.checkSizeLegality(packW, packH, optionWidth, optionHeight, doublePadding, allowRotate)) {
         // 打包失败
         console.log("打包失败，", file.name, "单图尺寸超图集大小");
