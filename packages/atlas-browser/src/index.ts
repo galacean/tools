@@ -10,9 +10,9 @@ import { OptTrim } from "./opt/OptTrim";
 
 const packingPipe = [new OptLoadImage(), new OptTrim(), new OptPacking(), new OptDrawing()];
 const DefaultOption = {
-  width: 2048,
-  height: 2048,
-  padding: 0,
+  width: 1024,
+  height: 1024,
+  padding: 1,
   allowRotate: false,
   square: false,
   pot: false,

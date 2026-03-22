@@ -13,7 +13,7 @@
  */
 import { MaxRectsMethod } from "../enums/MaxRectsMethod";
 import { Rect } from "../Rect";
-import type { IMaxRectsBinPack } from "./IMaxRectsBinPack";
+import type { IMaxRectsBinPack } from "@galacean/tools-atlas-algorithm";
 
 interface Score {
   value: number;
@@ -539,16 +539,22 @@ export class MaxRectsBinPack implements IMaxRectsBinPack {
 
   _pruneFreeList() {
     const freeRectangles = this.freeRectangles;
-    for (let i = 0; i < freeRectangles.length; i++) {
-      for (let j = i + 1; j < freeRectangles.length; j++) {
+    let i = 0;
+    while (i < freeRectangles.length) {
+      let j = i + 1;
+      while (j < freeRectangles.length) {
         if (Rect.isContainedIn(freeRectangles[i], freeRectangles[j])) {
           freeRectangles.splice(i, 1);
+          i--;
           break;
         }
         if (Rect.isContainedIn(freeRectangles[j], freeRectangles[i])) {
           freeRectangles.splice(j, 1);
+          j--;
         }
+        j++;
       }
+      i++;
     }
   }
 }

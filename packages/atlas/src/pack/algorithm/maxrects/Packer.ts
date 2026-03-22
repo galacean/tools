@@ -3,7 +3,7 @@ import Jimp from "jimp";
 import { Rect } from "../Rect";
 import { MaxRectsMethod } from "../enums/MaxRectsMethod";
 import { AtlasFormat } from "../enums/AtlasFormat";
-import { SmartRectsBinPack } from "./SmartRectsBinPack";
+import { SmartRectsBinPack } from "@galacean/tools-atlas-algorithm";
 import { Exporter } from "./Exporter";
 
 const POTS = [2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2];

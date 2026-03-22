@@ -163,7 +163,7 @@ export class OptDrawing extends OptHandler {
               })
               .catch((reason: any) => {
                 console.error(JSON.stringify(reason));
-                reject(null);
+                reject(new Error("Failed to convert canvas blob to ArrayBuffer"));
               });
           },
           "image/png",
@@ -180,12 +180,12 @@ export class OptDrawing extends OptHandler {
               })
               .catch((reason: any) => {
                 console.error(JSON.stringify(reason));
-                reject(null);
+                reject(new Error("Failed to convert offscreen blob to ArrayBuffer"));
               });
           })
           .catch((reason: any) => {
             console.error(JSON.stringify(reason));
-            reject(null);
+            reject(new Error("Failed to convert offscreen canvas to blob"));
           });
       }
     });
