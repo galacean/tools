@@ -35,7 +35,7 @@ export class OptLoadImage extends OptHandler {
                 (img.width <= maxWidth && img.height <= maxHeight) ||
                 (!!allowRotate && img.height <= maxWidth && img.width <= maxHeight);
               if (!canFit) {
-                reject(ErrorCode.PackError);
+                resolve(ErrorCode.PackError);
                 return;
               }
             }
