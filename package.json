@@ -42,8 +42,7 @@
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.4.1",
     "floss": "^5.0.1",
-    "husky": "^4.3.8",
-    "lint-staged": "^10.5.4",
+    "@evilmartians/lefthook": "^1.11.0",
     "nyc": "^15.1.0",
     "@galacean/engine": "^1.2.0-alpha",
     "prettier": "^2.7.1",
@@ -53,17 +52,5 @@
     "rollup-plugin-swc3": "^0.8.0",
     "ts-node": "^10",
     "typescript": "^4.8.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "lint-staged": {
-    "*.{ts}": [
-      "eslint --fix",
-      "git add"
-    ]
   }
 }

@@ -1,0 +1,12 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "packages/*/src/**/*.ts"
+      run: bash -lc 'npx eslint --fix {staged_files}'
+      stage_fixed: true
+
+commit-msg:
+  commands:
+    commitlint:
+      run: bash -lc 'npx commitlint --edit {1}'
