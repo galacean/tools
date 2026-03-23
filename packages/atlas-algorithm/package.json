@@ -5,7 +5,7 @@
   "scripts": {
     "b:types": "tsc",
     "lint:fix": "tslint --fix --project ./tsconfig.json",
-    "test": "../../node_modules/.bin/cross-env TS_NODE_PROJECT=./tests/tsconfig.json node -r ts-node/register tests/index.ts"
+    "test": "cross-env TS_NODE_PROJECT=./tests/tsconfig.json node -r ts-node/register tests/index.ts"
   },
   "publishConfig": {
     "access": "public",
