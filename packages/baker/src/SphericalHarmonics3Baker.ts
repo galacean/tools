@@ -406,7 +406,9 @@ export function decodeFaceSH(
       const u = ((x + 0.5) * 2 * iDim) - 1;
       const v = ((y + 0.5) * 2 * iDim) - 1;
 
-      // Cubemap face directions (same convention as original)
+      // GL cubemap standard face directions.
+      // Data comes from getPixelBuffer (GL readPixels), so directions must follow
+      // GL cubemap convention, not PanoramaToCube FACE_CORNERS layout.
       switch (faceIndex) {
         case 0: // +X
           direction[0] = 1;
