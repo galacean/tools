@@ -130,9 +130,6 @@ void main()
         dir = vec3(-cx,  cy, -1.);
     }
 
-    #ifdef FLIP_X
-        dir.x *= -1.0;
-    #endif
     dir = normalize(dir);
 
 

@@ -80,7 +80,6 @@ export class IBLBaker {
     bakerShaderData.setTexture("environmentMap", RTTScene);
     bakerShaderData.setFloat("u_textureSize", resolution);
     bakerShaderData.enableMacro("DECODE_MODE", DecodeMode.Linear + "");
-    bakerShaderData.enableMacro("FLIP_X");
 
     for (let face = 0; face < 6; face++) {
       for (let lod = 0; lod < bakerMipmapCount; lod++) {
