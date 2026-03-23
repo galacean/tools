@@ -7,6 +7,7 @@ export interface PackingOption {
   allowRotate?: boolean;
   square?: boolean;
   pot?: boolean;
+  allowTrim?: boolean;
   output?: string;
   method?: MaxRectsMethod;
 }

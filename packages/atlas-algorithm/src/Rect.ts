@@ -5,6 +5,7 @@ export class Rect {
   public height: number = 0;
   public name: string = "";
   public isRotated: boolean = false;
+  public allowRotate?: boolean;
 
   constructor(x = 0, y = 0, width = 0, height = 0, name = "") {
     this.x = x;
@@ -15,13 +16,7 @@ export class Rect {
   }
 
   clone() {
-    return new Rect(
-      this.x,
-      this.y,
-      this.width,
-      this.height,
-      `${this.name}-clone`
-    );
+    return new Rect(this.x, this.y, this.width, this.height, `${this.name}-clone`);
   }
 
   isContainedIn(rect: Rect) {

@@ -28,6 +28,7 @@
     "types/**/*"
   ],
   "dependencies": {
+    "@galacean/tools-atlas-algorithm": "workspace:*",
     "co": "^4.6.0",
     "commander": "^8.1.0",
     "jimp": "^0.16.1",

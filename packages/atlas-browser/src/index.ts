@@ -1,13 +1,14 @@
-import { type PackingItem } from "./interface/PackingItem";
-import { type PackingOutput } from "./interface/PackingOutput";
-import { type PackingOption } from "./interface/PackingOption";
+import { MaxRectsMethod } from "@galacean/tools-atlas-algorithm";
 import { ErrorCode } from "./enum/ErrorCode";
+import { type PackingItem } from "./interface/PackingItem";
+import { type PackingOption } from "./interface/PackingOption";
+import { type PackingOutput } from "./interface/PackingOutput";
 import { OptDrawing } from "./opt/OptDrawing";
 import { OptLoadImage } from "./opt/OptLoadImage";
 import { OptPacking } from "./opt/OptPacking";
-import { MaxRectsMethod } from "@galacean/tools-atlas-algorithm";
+import { OptTrim } from "./opt/OptTrim";
 
-const packingPipe = [new OptLoadImage(), new OptPacking(), new OptDrawing()];
+const packingPipe = [new OptLoadImage(), new OptTrim(), new OptPacking(), new OptDrawing()];
 const DefaultOption = {
   width: 1024,
   height: 1024,
@@ -25,6 +26,10 @@ const DefaultOption = {
  * @returns
  */
 export async function pack(images: PackingItem[], option?: PackingOption): Promise<PackingOutput> {
+  // 检查是否有图片
+  if (images.length === 0) {
+    return { code: ErrorCode.NoImage, msg: getErrorMessage(ErrorCode.NoImage) };
+  }
   if (option === undefined) {
     option = DefaultOption;
   } else {
@@ -36,21 +41,21 @@ export async function pack(images: PackingItem[], option?: PackingOption): Promi
       }
     }
   }
+
   // 开始打包
-  const outPut: PackingOutput = {
-    code: ErrorCode.Success,
-    msg: "打包成功！",
-    info: {}
-  };
+  const outPut: PackingOutput = {};
+  images.sort((a, b) => b.name.toLowerCase().localeCompare(a.name.toLowerCase()));
   const context = { option, images, outPut };
+  let code = ErrorCode.Success;
   for (let i = 0; i < packingPipe.length; i++) {
     const optCode = await packingPipe[i].parse(context);
     if (optCode !== ErrorCode.Success) {
-      context.outPut.code = optCode;
-      context.outPut.msg = getErrorMessage(optCode);
+      code = optCode;
       break;
     }
   }
+  outPut.code = code;
+  outPut.msg = getErrorMessage(code);
   return outPut;
 }
 
@@ -74,6 +79,6 @@ function getErrorMessage(code: ErrorCode) {
 }
 
 export { ErrorCode } from "./enum/ErrorCode";
+export type { PackingItem } from "./interface/PackingItem";
 export type { PackingOption } from "./interface/PackingOption";
 export type { PackingOutput } from "./interface/PackingOutput";
-export type { PackingItem } from "./interface/PackingItem";

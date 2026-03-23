@@ -49,7 +49,8 @@ const plugins = [
       jsc: {
         loose: true,
         externalHelpers: true,
-        target: "es5"
+        target: "es5",
+        baseUrl: process.cwd()
       },
       sourceMaps: true
     })
@@ -102,7 +103,8 @@ function makeRollupConfig(pkg) {
       output: {
         file: path.join(pkg.location, mainOutput),
         format: "commonjs",
-        sourcemap: true
+        sourcemap: true,
+        inlineDynamicImports: true
       },
       external: externals,
       plugins
@@ -114,7 +116,8 @@ function makeRollupConfig(pkg) {
       output: {
         file: path.join(pkg.location, moduleOutput),
         format: "es",
-        sourcemap: true
+        sourcemap: true,
+        inlineDynamicImports: true
       },
       external: externals,
       plugins
@@ -127,7 +130,8 @@ function makeRollupConfig(pkg) {
         file: path.join(pkg.location, browserOutput),
         format: "umd",
         name: toGlobalName(pkg.pkgJson.name),
-        globals: globals
+        globals: globals,
+        inlineDynamicImports: true
       },
       // 总包只 external @galacean/engine
       external: pkg.pkgJson.name === "@galacean/tools" ? ["@galacean/engine"] : externals,

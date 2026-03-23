@@ -14,7 +14,7 @@
     "test-debug": "cross-env TS_NODE_PROJECT=tsconfig.tests.json floss --path tests -r ts-node/register --debug",
     "test-cov": "cross-env TS_NODE_PROJECT=tsconfig.tests.json nyc --reporter=lcov floss --path tests -r ts-node/register",
     "ci": "pnpm install && npm run build && npm run b:types && npm run test-cov",
-    "lint": "eslint packages/*/src --ext .ts",
+    "lint": "eslint 'packages/*/src/**/*.ts'",
     "watch": "rollup -cw -m inline",
     "b:types": "pnpm -r --filter=./packages/* run b:types",
     "build": "rollup -c",
