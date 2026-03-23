@@ -4,8 +4,7 @@
   "description": "图集打包工具的算法",
   "scripts": {
     "b:types": "tsc",
-    "lint:fix": "tslint --fix --project ./tsconfig.json",
-    "test": "cross-env TS_NODE_PROJECT=./tests/tsconfig.json node -r ts-node/register tests/index.ts"
+    "lint:fix": "tslint --fix --project ./tsconfig.json"
   },
   "publishConfig": {
     "access": "public",
