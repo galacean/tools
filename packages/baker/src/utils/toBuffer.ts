@@ -7,9 +7,19 @@ const FILE_TYPE_BYTES = new TextEncoder().encode(FILE_TYPE);
 const FILE_HEADER_LENGTH = ((4 + 4 + 1 + 2 + FILE_TYPE_BYTES.length + 2) + 3) & ~3;
 
 /**
+ * Check whether an ArrayBuffer has a valid Galacean binary file header (magic + version).
+ */
+export function isValidFileHeader(data: ArrayBuffer, version: number): boolean {
+  if (data.byteLength < 9) return false;
+  const view = new DataView(data);
+  return view.getUint32(0, true) === FILE_HEADER_MAGIC && view.getUint8(8) === version;
+}
+
+/**
  * Write standard Galacean FileHeader into a DataView.
  * Returns the header byte length (= data start offset).
  */
+
 function writeFileHeader(dataView: DataView, buffer: ArrayBuffer, totalLength: number): number {
   dataView.setUint32(0, FILE_HEADER_MAGIC, true);
   dataView.setUint32(4, totalLength, true);
