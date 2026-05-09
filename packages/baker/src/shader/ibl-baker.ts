@@ -13,7 +13,7 @@ export default `Shader "Galacean-IBL-baker" {
         vec2 v_uv;
       }
 
-      #include "Common/Common.glsl"
+      #include "ShaderLibrary/Common/Common.glsl"
 
       samplerCube environmentMap;
       float face;
