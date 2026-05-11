@@ -1,5 +1,6 @@
 import resolve from "@rollup/plugin-node-resolve";
 import glslify from "rollup-plugin-glslify";
+import { shaderCompiler } from "@galacean/engine-shader-compiler/bundler/rollup";
 import { binary2base64 } from "rollup-plugin-binary2base64";
 import { swc, defineRollupSwcOption, minify } from "rollup-plugin-swc3";
 import camelCase from "camelcase";
@@ -41,6 +42,15 @@ const plugins = [
   resolve({ extensions, preferBuiltins: true }),
   glslify({
     include: [/\.glsl$/]
+  }),
+  shaderCompiler({
+    filter: (id) => /\.(shader|shaderc)$/.test(id),
+    precompile: {
+      input: path.resolve(pkgsRoot, "baker/src/shader"),
+      output: path.resolve(pkgsRoot, "baker/libs"),
+      clean: true,
+      emitIndex: true
+    }
   }),
   swc(
     defineRollupSwcOption({

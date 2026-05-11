@@ -1,4 +1,4 @@
-export default `Shader "Galacean-IBL-baker" {
+Shader "Galacean-IBL-baker" {
   SubShader "Default" {
     Pass "0" {
       VertexShader = vert;
@@ -211,4 +211,4 @@ export default `Shader "Galacean-IBL-baker" {
       }
     }
   }
-}`;
+}

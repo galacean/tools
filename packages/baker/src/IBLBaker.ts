@@ -15,10 +15,12 @@ import {
 } from "@galacean/engine";
 import { BakerResolution } from "./enums/BakerResolution";
 import { DecodeMode } from "./enums/DecodeMode";
-import iblBakerSource from "./shader/ibl-baker";
+import { IBLBakerSource } from "../libs";
 
 const SHADER_NAME = "Galacean-IBL-baker";
-Shader.find(SHADER_NAME) || Shader.create(iblBakerSource);
+
+// @ts-ignore
+Shader.find(SHADER_NAME) || Shader._createFromPrecompiled(IBLBakerSource);
 
 /**
  * Prefilterd, Mipmaped Environment map.
