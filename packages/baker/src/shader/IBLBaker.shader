@@ -7,11 +7,11 @@ Shader "Galacean-IBL-baker" {
       struct Attributes {
         vec3 POSITION;
         vec2 TEXCOORD_0;
-      }
+      };
 
       struct Varyings {
         vec2 v_uv;
-      }
+      };
 
       #include "ShaderLibrary/Common/Common.glsl"
 
