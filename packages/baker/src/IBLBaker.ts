@@ -15,7 +15,7 @@ import {
 } from "@galacean/engine";
 import { BakerResolution } from "./enums/BakerResolution";
 import { DecodeMode } from "./enums/DecodeMode";
-import { IBLBakerSource } from "../libs";
+import { IBLBakerSource } from "../compiledShaders";
 
 const SHADER_NAME = "Galacean-IBL-baker";
 

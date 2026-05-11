@@ -47,7 +47,7 @@ const plugins = [
     filter: (id) => /\.(shader|shaderc)$/.test(id),
     precompile: {
       input: path.resolve(pkgsRoot, "baker/src/shader"),
-      output: path.resolve(pkgsRoot, "baker/libs"),
+      output: path.resolve(pkgsRoot, "baker/compiledShaders"),
       clean: true,
       emitIndex: true
     }

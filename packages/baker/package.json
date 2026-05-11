@@ -18,7 +18,7 @@
   "bugs": "https://github.com/galacean/tools/issues",
   "scripts": {
     "b:types": "tsc",
-    "precompile": "shader-compiler-precompile src/shader libs --clean --emit-index",
+    "precompile": "shader-compiler-precompile src/shader compiledShaders --clean --emit-index",
     "lint:fix": "tslint --fix --project ./tsconfig.json"
   },
   "devDependencies": {
