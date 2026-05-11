@@ -21,9 +21,6 @@
     "precompile": "shader-compiler-precompile src/shader compiledShaders --clean --emit-index",
     "lint:fix": "tslint --fix --project ./tsconfig.json"
   },
-  "devDependencies": {
-    "@galacean/engine-shader-compiler": "^2.0.0-0"
-  },
   "types": "src/index.ts",
   "main": "src/index.ts",
   "module": "src/index.ts",
