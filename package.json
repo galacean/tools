@@ -44,7 +44,6 @@
     "floss": "^5.0.1",
     "@evilmartians/lefthook": "^1.11.0",
     "nyc": "^15.1.0",
-    "@galacean/engine": "^1.2.0-alpha",
     "prettier": "^2.7.1",
     "rollup": "^3",
     "rollup-plugin-binary2base64": "1.0.3",
