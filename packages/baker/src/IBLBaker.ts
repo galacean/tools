@@ -15,11 +15,12 @@ import {
 } from "@galacean/engine";
 import { BakerResolution } from "./enums/BakerResolution";
 import { DecodeMode } from "./enums/DecodeMode";
-import frag from "./shader/ibl_frag";
-import vertex from "./shader/vertex";
+import { IBLBakerSource } from "../compiledShaders";
 
 const SHADER_NAME = "Galacean-IBL-baker";
-Shader.create(SHADER_NAME, vertex, frag);
+
+// @ts-ignore
+Shader.find(SHADER_NAME) || Shader._createFromPrecompiled(IBLBakerSource);
 
 /**
  * Prefilterd, Mipmaped Environment map.
