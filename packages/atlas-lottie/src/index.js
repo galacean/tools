@@ -53,6 +53,7 @@ module.exports = async function transform(lottiePath, imagesPath, options = {}) 
 
     const { nm, assets } = data;
     const lottieAssets = Array.isArray(assets) ? assets : [];
+    const hasImageAssets = lottieAssets.some((asset) => asset.p);
     const { output } = options;
 
     const spritesDir = output ? `${output}/.sprites` : path.resolve(`.sprites`);
@@ -86,6 +87,13 @@ module.exports = async function transform(lottiePath, imagesPath, options = {}) 
     }
 
     if (images.length === 0) {
+      if (hasImageAssets) {
+        return {
+          code: 11,
+          msg: "No image files found for lottie image assets"
+        };
+      }
+
       if (fs.existsSync(spritesDir)) {
         fs.rmSync(spritesDir, { recursive: true, force: true });
       }
