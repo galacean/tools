@@ -16,11 +16,28 @@ function createImage(asset, dir) {
   return name;
 }
 
-module.exports = async function transform(
-  lottiePath,
-  imagesPath,
-  options = {}
-) {
+function createEmptyAtlas() {
+  return {
+    version: 0,
+    format: 1,
+    atlasItems: []
+  };
+}
+
+function ensureDir(dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+function writeLottieJson(data, dir, nm) {
+  ensureDir(dir);
+  const jsonFilePath = `${dir}/${nm}.json`;
+  fs.writeFileSync(jsonFilePath, JSON.stringify(data));
+  return jsonFilePath;
+}
+
+module.exports = async function transform(lottiePath, imagesPath, options = {}) {
   let rawData, data;
 
   if (lottiePath.startsWith("http://") || lottiePath.startsWith("https://")) {
@@ -35,6 +52,8 @@ module.exports = async function transform(
     }
 
     const { nm, assets } = data;
+    const lottieAssets = Array.isArray(assets) ? assets : [];
+    const hasImageAssets = lottieAssets.some((asset) => asset.p);
     const { output } = options;
 
     const spritesDir = output ? `${output}/.sprites` : path.resolve(`.sprites`);
@@ -54,8 +73,8 @@ module.exports = async function transform(
         fs.mkdirSync(dir);
       }
 
-      for (let i = 0, l = assets.length; i < l; i++) {
-        const asset = assets[i];
+      for (let i = 0, l = lottieAssets.length; i < l; i++) {
+        const asset = lottieAssets[i];
 
         // sprite assets
         if (asset.p) {
@@ -67,9 +86,40 @@ module.exports = async function transform(
       }
     }
 
+    if (images.length === 0) {
+      if (hasImageAssets) {
+        return {
+          code: 11,
+          msg: "No image files found for lottie image assets"
+        };
+      }
+
+      if (fs.existsSync(spritesDir)) {
+        fs.rmSync(spritesDir, { recursive: true, force: true });
+      }
+
+      data.assets = lottieAssets.filter((asset) => {
+        return !asset.p;
+      });
+
+      const atlasFilePath = `${dir}/${nm}.atlas`;
+      ensureDir(dir);
+      fs.writeFileSync(atlasFilePath, JSON.stringify(createEmptyAtlas()));
+
+      const jsonFilePath = writeLottieJson(data, dir, nm);
+      return {
+        code: 0,
+        msg: "Pack atlas success!",
+        info: {
+          atlasFile: atlasFilePath,
+          jsonFile: jsonFilePath
+        }
+      };
+    }
+
     const res = await atlasTool.pack(images, {
       output: `${dir}/${nm}`,
-      ...options,
+      ...options
     });
 
     if (res.code !== 0) {
@@ -78,7 +128,7 @@ module.exports = async function transform(
     }
 
     if (fs.existsSync(spritesDir)) {
-      fs.rmdirSync(spritesDir, { recursive: true });
+      fs.rmSync(spritesDir, { recursive: true, force: true });
     }
 
     // Rewrite lottie json file
@@ -86,8 +136,7 @@ module.exports = async function transform(
       return !asset.p;
     });
 
-    const jsonFilePath = `${dir}/${nm}.json`;
-    fs.writeFileSync(jsonFilePath, JSON.stringify(data));
+    const jsonFilePath = writeLottieJson(data, dir, nm);
 
     res.info.jsonFile = jsonFilePath;
 
@@ -97,7 +146,7 @@ module.exports = async function transform(
   } catch (error) {
     return {
       code: 11,
-      msg: "Parse lottie file error",
+      msg: "Parse lottie file error"
     };
   }
 };
