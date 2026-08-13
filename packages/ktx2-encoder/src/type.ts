@@ -83,14 +83,25 @@ export interface IBasisEncoder {
    */
   setMipGen(needGenMipmap: boolean): void;
   /**
-   * Use sRGB transfer func in the file's DFD. Default is FALSE. This should very probably match the "perceptual" setting.
-   * @param srgbTransferFunc need sRGB transfer func
+   * Uses the sRGB transfer function in the KTX2 DFD.
+   * @param isSRGB - Whether the stored texture uses the sRGB transfer function.
    */
-  setKTX2SRGBTransferFunc(srgbTransferFunc: boolean): void;
+  setKTX2SRGBTransferFunc(isSRGB: boolean): void;
   /**
-   * If true, the input is assumed to be in sRGB space. Be sure to set this correctly! (Examples: True on photos, albedo/spec maps, and false on normal maps.)
+   * Treats the source as perceptual color data for encoder error weighting.
+   * @param isSRGB - Whether the source contains sRGB color data.
    */
-  setPerceptual(perceptual: boolean): void;
+  setPerceptual(isSRGB: boolean): void;
+  /**
+   * Filters mipmaps in linear light when the source contains sRGB color data.
+   * @param isSRGB - Whether mip generation should decode and re-encode sRGB values.
+   */
+  setMipSRGB(isSRGB: boolean): void;
+  /**
+   * Renormalizes generated normal-map mip levels after filtering.
+   * @param renormalize - Whether mip-vector renormalization is enabled.
+   */
+  setMipRenormalize(renormalize: boolean): void;
 
   /** release memory */
   delete(): void;
@@ -242,17 +253,20 @@ interface BasisOptions {
    * RDO quality level, 0 - 10 float number, default is 1.0.
    */
   rdoQualityLevel?: number;
-  /**
-   * setNormalMapMode is the same as the basisu.exe "-normal_map" option. It tunes several codec parameters so compression works better on normal maps.
-   */
+  /** Enables linear normal-map compression and normalizes the source and generated mip levels. */
   isNormalMap?: boolean;
 
   /**
-   * If true, the input is assumed to be in sRGB space. Be sure to set this correctly! (Examples: True on photos, albedo/spec maps, and false on normal maps.)
+   * Whether the source and stored texture contain sRGB color data.
+   * This controls encoder perceptual weighting, linear-light mip generation, and the KTX2 DFD together.
+   */
+  isSRGB?: boolean;
+  /**
+   * @deprecated Use `isSRGB`. Kept for callers compiled against older encoder options.
    */
   isPerceptual?: boolean;
   /**
-   * Input source is sRGB. This should very probably match the "perceptual" setting.
+   * @deprecated Use `isSRGB`. Kept for callers compiled against older encoder options.
    */
   isSetKTX2SRGBTransferFunc?: boolean;
   /**

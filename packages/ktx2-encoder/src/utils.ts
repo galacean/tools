@@ -1,12 +1,11 @@
-
+/** Default options shared by the browser and Node.js Basis encoders. */
 export const DefaultOptions = {
   enableDebug: false,
   isUASTC: true,
   isKTX2File: true,
-  isInputSRGB: true,
+  isSRGB: true,
   generateMipmap: true,
   needSupercompression: true,
-  isSetKTX2SRGBTransferFunc: true,
   isHDR: false,
   qualityLevel: 150
 };
