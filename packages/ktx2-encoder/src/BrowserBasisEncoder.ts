@@ -144,7 +144,7 @@ class BasisEncoder implements IKtx2Encoder {
       for (let k in options.kvData) {
         container.keyValue[k] = options.kvData[k];
       }
-      actualKTX2FileData = write(container, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
+      actualKTX2FileData = write(container, { keepWriter: true }) as Uint8Array;
     }
     return actualKTX2FileData;
   }
@@ -208,7 +208,7 @@ class BasisEncoder implements IKtx2Encoder {
       }
     }
 
-    return write(baseContainer!, { keepWriter: true }) as Uint8Array<ArrayBuffer>;
+    return write(baseContainer!, { keepWriter: true }) as Uint8Array;
   }
 
   setTextureParams(
